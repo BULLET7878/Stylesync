@@ -19,28 +19,43 @@ const userRoutes = require('./routes/userRoutes');
 app.use(express.json());
 app.use(cors());
 
-// Database connection
+// Database connection with exponential backoff
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 10;
+
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 60000,
+      heartbeatFrequencyMS: 10000,
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    reconnectAttempts = 0;
   } catch (err) {
-    console.error(`Error: ${err.message}`);
-    process.exit(1);
+    console.error(`MongoDB connection error: ${err.message}`);
+    if (reconnectAttempts === 0) {
+      // First connection failure — exit and let process manager restart
+      process.exit(1);
+    }
   }
 };
 
 connectDB();
 
 mongoose.connection.on('error', err => {
-  console.error('MongoDB runtime error:', err);
+  console.error('MongoDB runtime error:', err.message);
 });
 
 mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected. Retrying...');
+  if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+    reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+    console.log(`MongoDB disconnected. Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})...`);
+    setTimeout(connectDB, delay);
+  } else {
+    console.error('Max reconnection attempts reached. Please check MongoDB Atlas connectivity.');
+  }
 });
 
 // Basic Route

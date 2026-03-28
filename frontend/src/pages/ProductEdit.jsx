@@ -9,7 +9,7 @@ const ProductEdit = () => {
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState(899);
@@ -22,6 +22,8 @@ const ProductEdit = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (!user || user.role !== 'seller') {
       navigate('/login');
       return;

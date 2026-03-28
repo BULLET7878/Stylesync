@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
-import { Package, Plus, Edit, Trash2, ShoppingBag, Truck, AlertCircle, Users, BarChart3 } from 'lucide-react';
+import { Package, Plus, Edit, Trash2, ShoppingBag, Truck, AlertCircle, Users, BarChart3, Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const SellerDashboard = () => {
@@ -19,41 +19,41 @@ const SellerDashboard = () => {
     mostViewedProducts: []
   });
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (!user || user.role !== 'seller') {
       navigate('/login');
       return;
     }
 
     const fetchData = async () => {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
 
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      // Fetch each source independently — one failure won't kill the whole dashboard
+      const [productsResult, ordersResult, usersResult, statsResult] = await Promise.allSettled([
+        axios.get(`${API_URL}/api/products/seller`, config),
+        axios.get(`${API_URL}/api/orders/seller`, config),
+        axios.get(`${API_URL}/api/users`, config),
+        axios.get(`${API_URL}/api/orders/stats`, config),
+      ]);
 
-        const [productsRes, ordersRes, usersRes, statsRes] = await Promise.all([
-          axios.get(`${API_URL}/api/products/seller`, config),
-          axios.get(`${API_URL}/api/orders/seller`, config),
-          axios.get(`${API_URL}/api/users`, config),
-          axios.get(`${API_URL}/api/orders/stats`, config),
-        ]);
+      if (productsResult.status === 'fulfilled') setProducts(productsResult.value.data);
+      else toast.error('Could not load your products');
 
-        setProducts(productsRes.data);
-        setOrders(ordersRes.data);
-        setUsersList(usersRes.data);
-        setStats(statsRes.data);
-      } catch (error) {
-        toast.error('Failed to fetch dashboard data');
-      } finally {
-        setLoading(false);
-      }
+      if (ordersResult.status === 'fulfilled') setOrders(ordersResult.value.data);
+      else toast.warn('Could not load orders');
+
+      if (usersResult.status === 'fulfilled') setUsersList(usersResult.value.data);
+
+      if (statsResult.status === 'fulfilled') setStats(statsResult.value.data);
+      else toast.warn('Dashboard stats unavailable — DB may be reconnecting');
+
+      setLoading(false);
     };
 
     fetchData();

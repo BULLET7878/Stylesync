@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { User, Package, Clock, CheckCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -62,10 +63,12 @@ const Dashboard = () => {
                       const config = { headers: { Authorization: `Bearer ${user.token}` } };
                       const { data } = await axios.put(`${API_URL}/api/users/upgrade`, {}, config);
                       localStorage.setItem('userInfo', JSON.stringify(data));
-                      window.location.reload();
                       toast.success('You are now a Seller!');
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 500);
                     } catch (err) {
-                      toast.error('Failed to upgrade account');
+                      toast.error(err.response?.data?.message || 'Failed to upgrade account');
                     }
                   }}
                   className="w-full bg-green-600 text-white hover:bg-green-700 py-3 rounded-xl font-bold transition-all shadow-md"

@@ -13,6 +13,26 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(userInfo));
     }
     setLoading(false);
+
+    // Global interceptor for 401 Unauthorized errors
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          // Force logout and optionally redirect
+          setUser(null);
+          localStorage.removeItem('userInfo');
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, []);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';

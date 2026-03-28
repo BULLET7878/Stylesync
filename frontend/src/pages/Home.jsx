@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { ProductContext } from '../context/ProductContext';
@@ -7,7 +7,7 @@ import ProductCard from '../components/ProductCard';
 import axios from 'axios';
 
 const Home = () => {
-  const { products, loading, searchProducts, aiRecommendations, fetchRecommendations } = useContext(ProductContext);
+  const { products, loading, searchProducts, fetchRecommendations } = useContext(ProductContext);
   const { user } = useContext(AuthContext);
   const [recentlyViewedProducts, setRecentlyViewedProducts] = React.useState([]);
 
@@ -53,45 +53,27 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 flex items-center gap-2">
-              <Sparkles className="w-8 h-8 text-primary-500" />
-              New Arrivals
-            </h2>
-            <p className="mt-2 text-lg text-gray-500">
-              Discover our complete collection of premium styles.
-            </p>
-          </div>
-          <Link to="/shop" className="hidden sm:flex text-primary-600 font-medium items-center hover:text-primary-700 bg-primary-50 px-5 py-2 rounded-full">
-            Browse collection <ArrowRight className="ml-2 w-4 h-4" />
-          </Link>
+      {/* Trend Spotlight — Grid */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">Trend Spotlight</h2>
+          <p className="mt-2 text-lg text-gray-500">The pieces everyone's talking about this season.</p>
         </div>
-
-        {loading ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[1, 2, 3, 4].map(n => (
-              <div key={n} className="animate-pulse bg-gray-100 rounded-2xl h-96 w-full border border-gray-100" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products && products.length > 0 ? (
-              products.map(product => (
+            {products && products
+              .filter(p => p.tags && (p.tags.includes('premium') || p.tags.includes('streetwear')))
+              .slice(0, 8)
+              .map(product => (
                 <ProductCard key={product._id} product={product} />
-              ))
-            ) : (
-              <p className="text-gray-500">No products available.</p>
-            )}
+              ))}
           </div>
-        )}
+        </div>
       </section>
 
-      {/* Recently Viewed Section */}
+      {/* Recently Viewed */}
       {recentlyViewedProducts.length > 0 && (
-        <section className="bg-gray-50 py-16">
+        <section className="bg-gray-50 py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-2 mb-10">
               <Clock className="w-8 h-8 text-primary-500" />

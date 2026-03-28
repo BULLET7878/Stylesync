@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ShoppingCart, Star, Heart, ArrowLeft, Sparkles } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
+import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 
@@ -14,6 +15,7 @@ const ProductDetail = () => {
   const [alsoBought, setAlsoBought] = useState([]);
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
 

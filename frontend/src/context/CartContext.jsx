@@ -39,16 +39,14 @@ export const CartProvider = ({ children }) => {
     };
     
     if (user) {
-      try {
-        const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        await axios.post(`${API_URL}/api/cart`, item, config);
-        fetchCart();
-      } catch (error) { console.error(error); }
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      await axios.post(`${API_URL}/api/cart`, item, config); // let errors propagate
+      await fetchCart();
     } else {
       const existItem = cartItems.find(x => x.product === item.product);
       let newCart;
       if (existItem) {
-        newCart = cartItems.map(x => x.product === existItem.product ? item : x);
+        newCart = cartItems.map(x => x.product === existItem.product ? { ...x, qty } : x);
       } else {
         newCart = [...cartItems, item];
       }

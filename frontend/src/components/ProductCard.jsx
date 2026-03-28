@@ -1,4 +1,10 @@
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
+import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const ProductCard = ({ product }) => {
   const { user } = useContext(AuthContext);

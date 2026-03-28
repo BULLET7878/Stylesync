@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading: authLoading } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
   const [searchWord, setSearchWord] = useState('');
@@ -91,14 +91,16 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center md:hidden">
-            <Link to="/cart" className="text-gray-600 hover:text-primary-600 relative mr-4">
-              <ShoppingCart className="h-6 w-6" />
-              {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItems.length}
-                </span>
-              )}
-            </Link>
+            {user?.role !== 'seller' && (
+              <Link to="/cart" className="text-gray-600 hover:text-primary-600 relative mr-4">
+                <ShoppingCart className="h-6 w-6" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+            )}
             <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 hover:text-primary-600 focus:outline-none">
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -123,6 +125,9 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                {user.role === 'seller' && (
+                  <Link to="/seller/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:bg-primary-50" onClick={() => setIsOpen(false)}>Seller Panel</Link>
+                )}
                 <button onClick={() => { logout(); setIsOpen(false); }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50">Logout</button>
               </>
             ) : (

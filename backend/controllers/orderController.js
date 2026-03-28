@@ -119,10 +119,13 @@ const updateOrderToDelivered = async (req, res) => {
 const getAdminStats = async (req, res) => {
   try {
     const Product = require('../models/Product');
-    const orders = await Order.find({}).populate('orderItems.product');
+    const orders = await Order.find({}).populate({
+      path: 'orderItems.product',
+      populate: { path: 'user', select: 'name' }
+    });
     const totalProducts = await Product.countDocuments({});
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+    const totalRevenue = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
 
     const productSales = {};
     const categorySales = {};
@@ -166,7 +169,7 @@ const getAdminStats = async (req, res) => {
     const mostViewedProducts = await Product.find({})
       .sort({ views: -1 })
       .limit(5)
-      .select('title views price image');
+      .select('title views price images');
 
     res.json({ 
       totalProducts, 

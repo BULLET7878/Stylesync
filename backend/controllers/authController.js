@@ -155,10 +155,14 @@ const getUserCount = async (req, res) => {
 // @access  Private
 const upgradeToSeller = async (req, res) => {
   try {
+    console.log('--- UPGRADE TO SELLER ---');
+    console.log('User ID:', req.user._id);
     const user = await User.findById(req.user._id);
     if (user) {
+      console.log('User found, current role:', user.role);
       user.role = 'seller';
       const updatedUser = await user.save();
+      console.log('User saved successfully');
       res.json({
         _id: updatedUser._id,
         name: updatedUser.name,
@@ -167,9 +171,11 @@ const upgradeToSeller = async (req, res) => {
         token: req.headers.authorization.split(' ')[1]
       });
     } else {
+      console.error('User not found for ID:', req.user._id);
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
+    console.error('Upgrade Error:', error.message);
     res.status(500).json({ message: error.message });
   }
 };

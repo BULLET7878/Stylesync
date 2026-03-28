@@ -12,3 +12,28 @@
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
 }
+
+/* Constant-speed catalog marquee */
+@keyframes catalogScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.catalog-track {
+  display: flex;
+  width: max-content;
+  animation: catalogScroll 45s linear infinite;
+  will-change: transform;
+}
+
+.catalog-track:hover {
+  animation-play-state: paused;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
