@@ -18,8 +18,9 @@ const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login?redirect=/checkout');
+    if (user && user.role === 'seller') {
+      toast.error('Sellers cannot purchase products. Please log in with a buyer account.');
+      navigate('/dashboard');
     }
     if (cartItems.length === 0) {
       navigate('/cart');

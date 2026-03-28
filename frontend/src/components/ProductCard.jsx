@@ -1,15 +1,12 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, Star, Heart } from 'lucide-react';
-import { CartContext } from '../context/CartContext';
-import { WishlistContext } from '../context/WishlistContext';
-import { toast } from 'react-toastify';
+import { AuthContext } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
+  const { user } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
   
   const isWishlisted = isInWishlist(product?._id);
+  const isSeller = user?.role === 'seller';
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -36,20 +33,24 @@ const ProductCard = ({ product }) => {
           alt={product.title}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
-        <button 
-          onClick={toggleWishlist}
-          className={`absolute top-4 right-4 p-2 rounded-full shadow-md transition-all z-10 ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-900 hover:bg-white'}`}
-        >
-          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
-        </button>
+        {!isSeller && (
+          <button 
+            onClick={toggleWishlist}
+            className={`absolute top-4 right-4 p-2 rounded-full shadow-md transition-all z-10 ${isWishlisted ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-900 hover:bg-white'}`}
+          >
+            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+          </button>
+        )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-        <button 
-          onClick={handleAddToCart}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 bg-white text-gray-900 px-6 py-3 rounded-full font-medium shadow-lg hover:bg-primary-50 hover:text-primary-600 transition-all duration-300 flex items-center gap-2 w-[calc(100%-2rem)] justify-center"
-        >
-          <ShoppingCart className="w-5 h-5" />
-          Add to Cart
-        </button>
+        {!isSeller && (
+          <button 
+            onClick={handleAddToCart}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 bg-white text-gray-900 px-6 py-3 rounded-full font-medium shadow-lg hover:bg-primary-50 hover:text-primary-600 transition-all duration-300 flex items-center gap-2 w-[calc(100%-2rem)] justify-center"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Add to Cart
+          </button>
+        )}
       </div>
       <div className="p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1 sm:gap-2">

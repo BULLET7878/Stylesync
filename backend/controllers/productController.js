@@ -66,8 +66,12 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Seller
 const createProduct = async (req, res) => {
-  try {
-    const {
+    console.log('--- CREATE PRODUCT ---');
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+    console.log('User Role:', req.user.role);
+
+    try {
+      const {
       title,
       price,
       description,

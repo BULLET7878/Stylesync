@@ -20,9 +20,28 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('MongoDB locally connected.'))
-.catch(err => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+};
+
+connectDB();
+
+mongoose.connection.on('error', err => {
+  console.error('MongoDB runtime error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected. Retrying...');
+});
 
 // Basic Route
 app.get('/', (req, res) => {

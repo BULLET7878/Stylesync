@@ -15,6 +15,10 @@ const addOrderItems = async (req, res) => {
       totalPrice,
     } = req.body;
 
+    if (req.user && req.user.role === 'seller') {
+      return res.status(403).json({ message: 'Sellers are not allowed to place orders' });
+    }
+
     if (orderItems && orderItems.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     } else {

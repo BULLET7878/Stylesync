@@ -110,33 +110,42 @@ const ProductDetail = () => {
               {product.description}
             </p>
 
-            <div className="mb-8 flex items-center gap-4">
-              <div className="w-32">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
-                   <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors">-</button>
-                   <div className="flex-1 text-center font-medium bg-white py-2">{qty}</div>
-                   <button onClick={() => setQty(Math.min(product.countInStock || 10, qty + 1))} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors">+</button>
+            {user?.role !== 'seller' ? (
+              <>
+                <div className="mb-8 flex items-center gap-4">
+                  <div className="w-32">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                    <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+                       <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors">-</button>
+                       <div className="flex-1 text-center font-medium bg-white py-2">{qty}</div>
+                       <button onClick={() => setQty(Math.min(product.countInStock || 10, qty + 1))} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors">+</button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-              <button 
-                onClick={handleAddToCart}
-                disabled={product.countInStock === 0}
-                className="flex-1 bg-primary-600 text-white rounded-xl py-4 flex items-center justify-center gap-2 font-semibold text-lg hover:bg-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
-              </button>
-              <button 
-                onClick={() => isWishlisted ? removeFromWishlist(id) : addToWishlist(id)}
-                className={`sm:w-16 h-14 sm:h-auto rounded-xl border flex items-center justify-center transition-all ${isWishlisted ? 'bg-red-50 text-red-500 border-red-200' : 'text-gray-500 border-gray-300 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
-              >
-                <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
-              </button>
-            </div>
+                <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+                  <button 
+                    onClick={handleAddToCart}
+                    disabled={product.countInStock === 0}
+                    className="flex-1 bg-primary-600 text-white rounded-xl py-4 flex items-center justify-center gap-2 font-semibold text-lg hover:bg-primary-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    {product.countInStock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  </button>
+                  <button 
+                    onClick={() => isWishlisted ? removeFromWishlist(id) : addToWishlist(id)}
+                    className={`sm:w-16 h-14 sm:h-auto rounded-xl border flex items-center justify-center transition-all ${isWishlisted ? 'bg-red-50 text-red-500 border-red-200' : 'text-gray-500 border-gray-300 hover:text-red-500 hover:border-red-200 hover:bg-red-50'}`}
+                  >
+                    <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="bg-primary-50 p-6 rounded-2xl border border-primary-100 mt-auto">
+                <p className="text-primary-800 font-medium">As a seller, you can manage your inventory through the Seller Panel. Sellers are restricted from purchasing products on the platform.</p>
+                <Link to="/seller/dashboard" className="inline-block mt-4 text-primary-600 font-bold hover:underline">Go to Seller Panel →</Link>
+              </div>
+            )}
           </div>
         </div>
 

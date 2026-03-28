@@ -107,6 +107,8 @@ const ProductEdit = () => {
       }
       navigate('/seller/dashboard');
     } catch (error) {
+      console.error('FRONTEND SAVE ERROR:', error);
+      console.error('Error Response:', error.response?.data);
       toast.error(error.response?.data?.message || 'Failed to save product');
     } finally {
       setSubmitting(false);
