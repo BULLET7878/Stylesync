@@ -23,6 +23,10 @@
       "destination": "/frontend/assets/$1"
     },
     {
+      "source": "/uploads/(.*)",
+      "destination": "/backend/server.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/index.html"
     }
