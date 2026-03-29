@@ -68,9 +68,8 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
 
-            {/* Logo */}
             <Link to="/" className="flex items-center flex-shrink-0 group">
-              <img src="/smart_logo.png" alt="SMART" className="h-10 w-auto object-contain" />
+              <img src="/stylesync_logo.png" alt="StyleSync" className="h-10 w-auto object-contain" />
             </Link>
 
             {/* Search Bar — Desktop */}
