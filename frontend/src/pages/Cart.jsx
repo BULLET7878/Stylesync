@@ -38,14 +38,19 @@ const Cart = () => {
               {cartItems.map((item) => (
                 <li key={item.product} className="p-6 flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-full sm:w-24 h-24 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image && item.image.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   
                   <div className="flex-1 text-center sm:text-left">
                     <Link to={`/product/${item.product}`} className="text-lg font-semibold text-gray-900 hover:text-primary-600">
                       {item.name}
                     </Link>
-                    <p className="text-gray-500 font-medium mt-1">₹{item.price.toFixed(2)}</p>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
+                      <p className="text-gray-900 font-bold">₹{item.price.toFixed(2)}</p>
+                      {item.originalPrice > item.price && (
+                        <p className="text-sm font-medium text-gray-400 line-through">₹{item.originalPrice.toFixed(2)}</p>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="flex items-center gap-4">

@@ -78,8 +78,12 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  console.error('--- GLOBAL ERROR ---');
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(err.status || 500).json({ 
+    message: err.message || 'Something went wrong!',
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack
+  });
 });
 
 app.listen(PORT, () => {

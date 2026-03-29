@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Wishlist from './pages/Wishlist';
 import SellerDashboard from './pages/SellerDashboard';
 import ProductEdit from './pages/ProductEdit';
+import OrderSuccess from './pages/OrderSuccess';
 import Info from './pages/Info';
 
 const ScrollToTop = () => {
@@ -33,6 +34,7 @@ function App() {
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
+          <Route path="order-success" element={<OrderSuccess />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="seller/dashboard" element={<SellerDashboard />} />

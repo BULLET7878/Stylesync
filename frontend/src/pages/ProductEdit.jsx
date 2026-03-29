@@ -13,6 +13,7 @@ const ProductEdit = () => {
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState(899);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('tshirts');
   const [countInStock, setCountInStock] = useState(1);
@@ -36,6 +37,7 @@ const ProductEdit = () => {
           const { data } = await axios.get(`${API_URL}/api/products/${id}`);
           setTitle(data.title);
           setPrice(data.price);
+          setDiscountPercent(data.discountPercent || 0);
           setDescription(data.description);
           setCategory(data.category);
           setCountInStock(data.countInStock);
@@ -81,12 +83,16 @@ const ProductEdit = () => {
     e.preventDefault();
     setSubmitting(true);
 
+    const calculatedDiscountPrice = discountPercent > 0 ? Number(price) * (1 - (Number(discountPercent) / 100)) : 0;
+    
     const productData = {
       title,
-      price,
+      price: Number(price),
+      discountPrice: calculatedDiscountPrice,
+      discountPercent: Number(discountPercent),
       description,
       category,
-      countInStock,
+      countInStock: Number(countInStock),
       images,
       tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
     };
@@ -151,7 +157,7 @@ const ProductEdit = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Price (₹)</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Regular Price (₹)</label>
               <input
                 type="number"
                 required
@@ -166,18 +172,37 @@ const ProductEdit = () => {
             </div>
 
             <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Discount Percentage (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="99"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="e.g., 5 for 5% off"
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(e.target.value)}
+              />
+              <p className="text-xs text-primary-600 mt-1 font-medium">
+                {Boolean(discountPercent > 0 && price > 0) && (
+                  `Final Price: ₹${(price * (1 - discountPercent/100)).toFixed(0)} (Saving ₹${(price * (discountPercent/100)).toFixed(0)})`
+                )}
+              </p>
+            </div>
+
+            <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
               <select
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="tshirts">T-Shirts</option>
-                <option value="jeans">Jeans</option>
-                <option value="ethnic">Ethnic Wear</option>
-                <option value="shoes">Shoes</option>
-                <option value="accessories">Accessories</option>
-                <option value="shirts">Shirts</option>
+                <option value="Shirts">Shirts</option>
+                <option value="T-Shirts">T-Shirts</option>
+                <option value="Jeans">Jeans</option>
+                <option value="Trousers">Trousers</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Ethnic Wear">Ethnic Wear</option>
               </select>
             </div>
 
@@ -222,7 +247,7 @@ const ProductEdit = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 {images.map((img, idx) => (
                   <div key={idx} className="relative aspect-[4/5] rounded-xl overflow-hidden border border-gray-100 group">
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={img && img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${img}`} alt="" className="w-full h-full object-cover" />
                     <button 
                       type="button"
                       onClick={() => removeImage(idx)}

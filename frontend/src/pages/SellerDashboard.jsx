@@ -22,6 +22,8 @@ const SellerDashboard = () => {
   const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const hasFetched = React.useRef(false);
+  
   useEffect(() => {
     if (authLoading) return;
 
@@ -30,34 +32,40 @@ const SellerDashboard = () => {
       return;
     }
 
+    if (hasFetched.current) return;
+
     const fetchData = async () => {
+      hasFetched.current = true;
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
 
-      // Fetch each source independently — one failure won't kill the whole dashboard
-      const [productsResult, ordersResult, usersResult, statsResult] = await Promise.allSettled([
-        axios.get(`${API_URL}/api/products/seller`, config),
-        axios.get(`${API_URL}/api/orders/seller`, config),
-        axios.get(`${API_URL}/api/users`, config),
-        axios.get(`${API_URL}/api/orders/stats`, config),
-      ]);
+      try {
+        // Fetch each source independently — one failure won't kill the whole dashboard
+        const [productsResult, ordersResult, statsResult] = await Promise.allSettled([
+          axios.get(`${API_URL}/api/products/seller`, config),
+          axios.get(`${API_URL}/api/orders/seller`, config),
+          axios.get(`${API_URL}/api/orders/stats`, config),
+        ]);
 
-      if (productsResult.status === 'fulfilled') setProducts(productsResult.value.data);
-      else toast.error('Could not load your products');
+        if (productsResult.status === 'fulfilled') setProducts(productsResult.value.data);
+        else if (productsResult.reason?.response?.status === 401) toast.error('Account upgrade required to access products');
+        else toast.error('Could not load your products');
 
-      if (ordersResult.status === 'fulfilled') setOrders(ordersResult.value.data);
-      else toast.warn('Could not load orders');
+        if (ordersResult.status === 'fulfilled') setOrders(ordersResult.value.data);
+        else if (ordersResult.reason?.response?.status !== 401) toast.warn('Could not load orders');
 
-      if (usersResult.status === 'fulfilled') setUsersList(usersResult.value.data);
+        if (statsResult.status === 'fulfilled') setStats(statsResult.value.data);
+        else if (statsResult.reason?.response?.status !== 401) toast.warn('Dashboard stats unavailable — DB may be reconnecting');
 
-      if (statsResult.status === 'fulfilled') setStats(statsResult.value.data);
-      else toast.warn('Dashboard stats unavailable — DB may be reconnecting');
-
-      setLoading(false);
+      } catch (err) {
+        console.error('Fetch Error:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const deleteHandler = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -102,7 +110,7 @@ const SellerDashboard = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <p className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Total Revenue</p>
           <p className="text-3xl font-bold text-gray-900">₹{(stats.totalRevenue || 0).toLocaleString()}</p>
@@ -123,13 +131,6 @@ const SellerDashboard = () => {
           <Link to="/seller/product/new" className="mt-2 text-primary-600 text-xs font-bold hover:underline inline-block">
             Manage Inventory
           </Link>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <p className="text-gray-500 text-sm font-medium mb-1 uppercase tracking-wider">Active Users</p>
-          <p className="text-3xl font-bold text-gray-900">{usersList.length}</p>
-          <div className="mt-2 text-purple-600 text-xs font-bold bg-purple-50 px-2 py-1 rounded-md inline-block">
-            Platform wide
-          </div>
         </div>
       </div>
 
@@ -250,7 +251,7 @@ const SellerDashboard = () => {
                       <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <img src={product.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
+                            <img src={product.images[0] && product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${product.images[0]}`} alt="" className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
                             <span className="font-medium text-gray-900">{product.title}</span>
                           </div>
                         </td>
@@ -292,6 +293,8 @@ const SellerDashboard = () => {
                   <tr>
                     <th className="px-6 py-4 text-sm font-semibold text-gray-600">Order ID</th>
                     <th className="px-6 py-4 text-sm font-semibold text-gray-600">Buyer</th>
+                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Shipping Address</th>
+                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Payment</th>
                     <th className="px-6 py-4 text-sm font-semibold text-gray-600">Total</th>
                     <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
                     <th className="px-6 py-4 text-sm font-semibold text-gray-600">Actions</th>
@@ -300,7 +303,7 @@ const SellerDashboard = () => {
                 <tbody className="divide-y divide-gray-100">
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-10 text-center text-gray-500">No orders received yet.</td>
+                      <td colSpan="7" className="px-6 py-10 text-center text-gray-500">No orders received yet.</td>
                     </tr>
                   ) : (
                     orders.map(order => (
@@ -311,6 +314,18 @@ const SellerDashboard = () => {
                             <span className="font-bold text-gray-900">{order.user?.name}</span>
                             <span className="text-gray-500">{order.user?.email}</span>
                           </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col text-sm text-gray-600">
+                            <span>{order.shippingAddress?.address}</span>
+                            <span>{order.shippingAddress?.city}, {order.shippingAddress?.postalCode}</span>
+                            <span>{order.shippingAddress?.country}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${order.isPaid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {order.isPaid ? 'PAID' : 'UNPAID'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 font-bold text-gray-900">₹{order.totalPrice.toLocaleString()}</td>
                         <td className="px-6 py-4">
@@ -328,47 +343,6 @@ const SellerDashboard = () => {
                             </button>
                           )}
                         </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        {/* User Management Section */}
-        <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Users className="w-6 h-6 text-primary-500" /> User Management
-          </h2>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-50 border-b border-gray-100">
-                  <tr>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Name</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Role</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-gray-600">Joined</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {usersList.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" className="px-6 py-10 text-center text-gray-500">No users found.</td>
-                    </tr>
-                  ) : (
-                    usersList.map(u => (
-                      <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 font-bold text-gray-900">{u.name}</td>
-                        <td className="px-6 py-4 text-gray-600">{u.email}</td>
-                        <td className="px-6 py-4 capitalize">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'seller' ? 'bg-purple-100 text-purple-700' : u.role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
-                            {u.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-500 text-sm">{new Date(u.createdAt).toLocaleDateString()}</td>
                       </tr>
                     ))
                   )}

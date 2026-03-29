@@ -175,7 +175,7 @@ const upgradeToSeller = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    console.error('Upgrade Error:', error.message);
+    console.error('Upgrade Error STACK:', error.stack || error.message);
     res.status(500).json({ message: error.message });
   }
 };

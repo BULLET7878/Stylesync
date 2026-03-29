@@ -91,6 +91,33 @@ const getSellerOrders = async (req, res) => {
   }
 };
 
+// @desc    Update order to paid
+// @route   PUT /api/orders/:id/pay
+// @access  Private
+const updateOrderToPaid = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentResult = {
+        id: req.body.id || `MOCK_PAY_${Date.now()}`,
+        status: req.body.status || 'COMPLETED',
+        update_time: req.body.update_time || new Date().toISOString(),
+        email_address: req.body.email_address || req.user.email,
+      };
+
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Update order to delivered
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Seller
@@ -119,54 +146,73 @@ const updateOrderToDelivered = async (req, res) => {
 const getAdminStats = async (req, res) => {
   try {
     const Product = require('../models/Product');
-    const orders = await Order.find({}).populate({
+    const isSeller = req.user.role === 'seller';
+    
+    // If seller, only stats for their products
+    const query = {};
+    if (isSeller) {
+      const sellerProducts = await Product.find({ user: req.user._id }).select('_id');
+      const productIds = sellerProducts.map(p => p._id);
+      query['orderItems.product'] = { $in: productIds };
+    }
+
+    const orders = await Order.find(query).populate({
       path: 'orderItems.product',
       populate: { path: 'user', select: 'name' }
     });
-    const totalProducts = await Product.countDocuments({});
+
+    const totalProducts = isSeller 
+      ? await Product.countDocuments({ user: req.user._id })
+      : await Product.countDocuments({});
+    
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
+    const totalRevenue = orders.reduce((acc, order) => {
+      // For sellers, only count revenue from THEIR items in this order
+      if (isSeller) {
+        const sellerItems = order.orderItems.filter(item => 
+          item.product && item.product.user && item.product.user._id.toString() === req.user._id.toString()
+        );
+        return acc + sellerItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      }
+      return acc + (order.totalPrice || 0);
+    }, 0);
 
     const productSales = {};
     const categorySales = {};
     const dailyRevenue = {};
 
     orders.forEach(order => {
-      // Daily Revenue Trends
-      if (order.createdAt) {
-        const date = order.createdAt.toISOString().split('T')[0];
-        dailyRevenue[date] = (dailyRevenue[date] || 0) + (order.totalPrice || 0);
-      }
-
       if (order.orderItems) {
         order.orderItems.forEach(item => {
           if (item.product && typeof item.product === 'object') {
-            const productId = item.product._id;
-            const category = item.product.category || 'Uncategorized';
+            const productRef = item.product;
+            const sellerOfProduct = productRef.user?._id || productRef.user;
             
-            productSales[productId] = (productSales[productId] || 0) + (item.qty || 0);
-            categorySales[category] = (categorySales[category] || 0) + (item.qty || 0);
+            // Only count if it's the seller's product (or if user is admin)
+            if (!isSeller || (sellerOfProduct && sellerOfProduct.toString() === req.user._id.toString())) {
+              const productId = productRef._id;
+              const category = productRef.category || 'Uncategorized';
+              const itemRevenue = item.price * item.qty;
+              
+              productSales[productId] = (productSales[productId] || 0) + (item.qty || 0);
+              categorySales[category] = (categorySales[category] || 0) + (item.qty || 0);
+              
+              if (order.createdAt) {
+                const date = order.createdAt.toISOString().split('T')[0];
+                dailyRevenue[date] = (dailyRevenue[date] || 0) + itemRevenue;
+              }
+            }
           }
         });
       }
     });
-
-    const topProducts = Object.entries(productSales)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([id, qty]) => ({ id, qty }));
-
-    const topCategories = Object.entries(categorySales)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name, qty]) => ({ name, qty }));
 
     const revenueTrends = Object.entries(dailyRevenue)
       .sort((a, b) => new Date(a[0]) - new Date(b[0]))
       .slice(-7)
       .map(([date, amount]) => ({ date, amount }));
 
-    const mostViewedProducts = await Product.find({})
+    const mostViewedProducts = await Product.find(isSeller ? { user: req.user._id } : {})
       .sort({ views: -1 })
       .limit(5)
       .select('title views price images');
@@ -175,8 +221,8 @@ const getAdminStats = async (req, res) => {
       totalProducts, 
       totalOrders, 
       totalRevenue, 
-      topProducts, 
-      topCategories, 
+      topProducts: Object.entries(productSales).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,qty])=>({id,qty})), 
+      topCategories: Object.entries(categorySales).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,qty])=>({name,qty})), 
       revenueTrends,
       mostViewedProducts 
     });
@@ -190,6 +236,7 @@ module.exports = {
   getOrderById,
   getMyOrders,
   getSellerOrders,
+  updateOrderToPaid,
   updateOrderToDelivered,
   getAdminStats,
 };

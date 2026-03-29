@@ -34,11 +34,16 @@ const ProductCard = ({ product }) => {
     <Link to={`/product/${product._id}`} className="group block bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
         <img 
-          src={product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'} 
+          src={product.images && product.images[0] ? (product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${product.images[0]}`) : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'} 
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }}
           alt={product.title}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
+        {product.discountPrice > 0 && product.discountPrice < product.price && (
+          <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg uppercase tracking-widest z-10 shadow-xl border border-white/20 animate-pulse-subtle">
+            {Math.round((1 - (product.discountPrice / product.price)) * 100)}% OFF
+          </div>
+        )}
         {!isSeller && (
           <button 
             onClick={toggleWishlist}
@@ -76,7 +81,16 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
         <h3 className="font-semibold text-gray-900 text-lg mb-1 truncate">{product.title}</h3>
-        <p className="text-xl font-bold text-gray-900">₹{(product.price || 0).toFixed(2)}</p>
+        <div className="flex items-center gap-2">
+          {product.discountPrice > 0 ? (
+            <>
+              <p className="text-xl font-bold text-red-600">₹{product.discountPrice.toFixed(2)}</p>
+              <p className="text-sm font-medium text-gray-400 line-through mt-1">₹{product.price.toFixed(2)}</p>
+            </>
+          ) : (
+            <p className="text-xl font-bold text-gray-900">₹{(product.price || 0).toFixed(2)}</p>
+          )}
+        </div>
       </div>
     </Link>
   );

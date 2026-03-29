@@ -26,6 +26,14 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  discountPrice: {
+    type: Number,
+    default: 0,
+  },
+  discountPercent: {
+    type: Number,
+    default: 0,
+  },
   category: {
     type: String, // e.g., 'shoes', 'shirts', 'trousers', 'accessories'
     required: true,

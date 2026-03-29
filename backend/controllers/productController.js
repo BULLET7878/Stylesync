@@ -14,14 +14,36 @@ const getProducts = async (req, res) => {
         }
       : {};
 
-    const category = req.query.category ? { category: req.query.category } : {};
+    const category = req.query.category 
+      ? { category: { $regex: new RegExp(`^${req.query.category}$`, 'i') } } 
+      : {};
+    
+    const priceFilter = {};
+    if (req.query.minPrice && req.query.minPrice.trim() !== '') {
+      const min = Number(req.query.minPrice);
+      if (!Number.isNaN(min)) priceFilter.$gte = min;
+    }
+    if (req.query.maxPrice && req.query.maxPrice.trim() !== '') {
+      const max = Number(req.query.maxPrice);
+      if (!Number.isNaN(max)) priceFilter.$lte = max;
+    }
+    const finalPriceFilter = Object.keys(priceFilter).length > 0 ? { price: priceFilter } : {};
+
+    // Rating Filter - Hardened dynamic builder
+    const ratingFilter = {};
+    if (req.query.rating && req.query.rating.trim() !== '') {
+      const r = Number(req.query.rating);
+      if (!Number.isNaN(r)) {
+        ratingFilter.rating = { $gte: r };
+      }
+    }
 
     let sortBy = { createdAt: -1 }; // Default: New Arrivals
     if (req.query.sort === 'price_asc') sortBy = { price: 1 };
     else if (req.query.sort === 'price_desc') sortBy = { price: -1 };
     else if (req.query.sort === 'popularity') sortBy = { rating: -1, numReviews: -1 };
 
-    const products = await Product.find({ ...keyword, ...category })
+    const products = await Product.find({ ...keyword, ...category, ...finalPriceFilter, ...ratingFilter })
       .populate('user', 'name')
       .sort(sortBy);
       
@@ -74,6 +96,7 @@ const createProduct = async (req, res) => {
       const {
       title,
       price,
+      discountPrice,
       description,
       images,
       category,
@@ -84,6 +107,7 @@ const createProduct = async (req, res) => {
     const product = new Product({
       title,
       price,
+      discountPrice: discountPrice || 0,
       user: req.user._id,
       images: images || ['/images/sample.jpg'],
       category,
@@ -108,6 +132,7 @@ const updateProduct = async (req, res) => {
     const {
       title,
       price,
+      discountPrice,
       description,
       images,
       category,
@@ -123,6 +148,7 @@ const updateProduct = async (req, res) => {
       }
       product.title = title || product.title;
       product.price = price || product.price;
+      product.discountPrice = discountPrice !== undefined ? discountPrice : product.discountPrice;
       product.description = description || product.description;
       product.images = images || product.images;
       product.category = category || product.category;

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { getUsers, getUserCount, upgradeToSeller } = require('../controllers/authController');
-const { protect, seller } = require('../middleware/authMiddleware');
+const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/upgrade')
   .put(protect, upgradeToSeller);
 
 router.route('/')
-  .get(protect, seller, getUsers);
+  .get(protect, admin, getUsers);
 
 router.route('/count')
-  .get(protect, seller, getUserCount);
+  .get(protect, admin, getUserCount);
 
 module.exports = router;

@@ -19,7 +19,8 @@ const Home = () => {
       const ids = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
       if (ids.length > 0) {
         try {
-          const promises = ids.map(id => axios.get(`/api/products/${id}`));
+          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+          const promises = ids.map(id => axios.get(`${API_URL}/api/products/${id}`));
           const responses = await Promise.all(promises);
           setRecentlyViewedProducts(responses.map(res => res.data));
         } catch (error) {
@@ -54,16 +55,20 @@ const Home = () => {
       </section>
 
       {/* Trend Spotlight — Grid */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-6 h-6 text-amber-500" />
+            <span className="text-sm font-bold text-amber-600 uppercase tracking-widest">Editor's Choice</span>
+          </div>
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">Trend Spotlight</h2>
           <p className="mt-2 text-lg text-gray-500">The pieces everyone's talking about this season.</p>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products && products
-              .filter(p => p.tags && (p.tags.includes('premium') || p.tags.includes('streetwear')))
-              .slice(0, 8)
+              .filter(p => !p.tags || p.tags.length === 0 || p.tags.includes('premium') || p.tags.includes('streetwear') || p.tags.includes('trending'))
+              .slice(0, 4)
               .map(product => (
                 <ProductCard key={product._id} product={product} />
               ))}
@@ -71,15 +76,41 @@ const Home = () => {
         </div>
       </section>
 
+      {/* New Arrivals — Grid */}
+      <section className="py-16 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="w-6 h-6 text-primary-500" />
+            <span className="text-sm font-bold text-primary-600 uppercase tracking-widest">Just In</span>
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">New Arrivals</h2>
+          <p className="mt-2 text-lg text-gray-500">Fresh styles just landed in our shop.</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products && products
+              .slice(0, 8)
+              .map(product => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+          </div>
+          <div className="mt-12 text-center">
+            <Link to="/shop" className="inline-flex items-center gap-2 text-primary-600 font-bold hover:text-primary-700 transition-colors">
+              View All Products <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Recently Viewed */}
       {recentlyViewedProducts.length > 0 && (
-        <section className="bg-gray-50 py-24">
+        <section className="bg-white py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 mb-10">
-              <Clock className="w-8 h-8 text-primary-500" />
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">Recently Viewed</h2>
+            <div className="flex items-center gap-2 mb-10 text-gray-400">
+              <Clock className="w-6 h-6" />
+              <h2 className="text-2xl font-bold tracking-tight">Recently Viewed</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 opacity-75 grayscale-[0.5] hover:grayscale-0 transition-all duration-500">
               {recentlyViewedProducts.map(product => (
                 <ProductCard key={product._id} product={product} />
               ))}

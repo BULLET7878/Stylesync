@@ -10,12 +10,15 @@ export const ProductProvider = ({ children }) => {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-  const searchProducts = async (keyword = '', category = '', sort = '') => {
+  const searchProducts = async (keyword = '', category = '', sort = '', minPrice = '', maxPrice = '', rating = '') => {
     setLoading(true);
     try {
       let query = `?keyword=${keyword}`;
       if (category) query += `&category=${category}`;
       if (sort) query += `&sort=${sort}`;
+      if (minPrice !== '' && minPrice !== null) query += `&minPrice=${minPrice}`;
+      if (maxPrice !== '' && maxPrice !== null) query += `&maxPrice=${maxPrice}`;
+      if (rating !== '' && rating !== null) query += `&rating=${rating}`;
       const { data } = await axios.get(`${API_URL}/api/products${query}`);
       setProducts(data);
     } catch (error) {
