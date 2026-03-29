@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <img src="/ss_logo.png" alt="SSYNC" className="h-10 w-auto object-contain invert mix-blend-screen" />
+              <img src="/hex_logo.png" alt="SSYNC" className="h-10 w-auto object-contain invert mix-blend-screen" />
               <div className="flex items-center text-white font-black">
                 <span className="text-3xl leading-none tracking-tighter mr-1">S</span>
                 <div className="flex flex-col text-[0.55rem] leading-[1.1] uppercase tracking-[0.25em] mt-1">
