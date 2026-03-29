@@ -10,11 +10,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-                <img src="/swastik.svg" alt="StyleSync" className="w-5 h-5 brightness-0 invert" />
-              </div>
-              <span className="font-black text-xl text-white">StyleSync</span>
+            <Link to="/" className="flex items-center mb-4">
+              <img src="/smart_logo.png" alt="SMART" className="h-10 w-auto object-contain brightness-0 invert mix-blend-screen" />
             </Link>
             <p className="text-sm leading-relaxed mb-5 max-w-xs">
               India's modern fashion marketplace. Discover curated styles from independent sellers and top brands.
