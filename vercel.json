@@ -23,8 +23,8 @@
       "destination": "/backend/server.js"
     },
     {
-      "source": "/((?!api|uploads|assets|_next|.[^.]+$).*)",
-      "destination": "/frontend/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
