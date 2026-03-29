@@ -71,7 +71,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
               <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shadow-md group-hover:bg-primary-700 transition-colors">
-                <img src="/stylesync_logo.svg" alt="StyleSync" className="w-5 h-5 brightness-0 invert" />
+                <img src="/swastik.svg" alt="StyleSync" className="w-5 h-5 brightness-0 invert" />
               </div>
               <span className="font-black text-xl tracking-tight text-gray-900 hidden sm:block">StyleSync</span>
             </Link>
