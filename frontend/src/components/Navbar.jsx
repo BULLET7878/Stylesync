@@ -68,9 +68,14 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
 
-            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-              <img src="/hex_logo.png" alt="SSYNC" className="h-10 w-auto object-contain" />
-              <span className="font-black text-xl tracking-tight text-gray-900 hidden sm:block">SSYNC</span>
+            <Link to="/" className="flex items-center flex-shrink-0 group">
+              <div className="flex items-center text-gray-900 font-black">
+                <span className="text-[2.5rem] leading-none tracking-tighter mr-1">S</span>
+                <div className="flex flex-col text-[0.65rem] leading-[1.1] uppercase tracking-[0.25em] mt-1">
+                  <span>mart</span>
+                  <span>ync</span>
+                </div>
+              </div>
             </Link>
 
             {/* Search Bar — Desktop */}
