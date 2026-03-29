@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center mb-4">
-              <img src="/stylesync_logo.png" alt="StyleSync" className="h-10 w-auto object-contain brightness-0 invert mix-blend-screen" />
+              <img src="/ssync_logo.png" alt="SSYNC" className="h-16 w-auto object-contain brightness-0 invert mix-blend-screen scale-[1.3] origin-left" />
             </Link>
             <p className="text-sm leading-relaxed mb-5 max-w-xs">
               India's modern fashion marketplace. Discover curated styles from independent sellers and top brands.

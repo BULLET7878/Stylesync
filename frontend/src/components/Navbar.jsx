@@ -69,7 +69,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-16 gap-4">
 
             <Link to="/" className="flex items-center flex-shrink-0 group">
-              <img src="/stylesync_logo.png" alt="StyleSync" className="h-10 w-auto object-contain" />
+              <img src="/ssync_logo.png" alt="SSYNC" className="h-16 w-auto object-contain scale-[1.3] origin-left" />
             </Link>
 
             {/* Search Bar — Desktop */}
