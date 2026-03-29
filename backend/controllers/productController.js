@@ -71,11 +71,31 @@ const getSellerProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate('user', 'name');
+    const jwt = require('jsonwebtoken');
 
     if (product) {
       product.views = (product.views || 0) + 1;
       await product.save();
-      res.json(product);
+      
+      const productObj = product.toObject();
+      
+      // Manual auth check for public route to detect ownership
+      let currentUser = null;
+      if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+          const token = req.headers.authorization.split(' ')[1];
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          currentUser = decoded.id;
+        } catch (e) {
+          // Ignore invalid tokens for public route
+        }
+      }
+
+      if (currentUser) {
+        productObj.isOwner = product.user._id.toString() === currentUser.toString() || (req.user && req.user.role === 'admin');
+      }
+      
+      res.json(productObj);
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
@@ -143,8 +163,11 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      if (product.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-        return res.status(401).json({ message: 'User not authorized' });
+      const isOwner = product.user.toString() === req.user._id.toString();
+      const isAdmin = req.user.role === 'admin';
+      
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ message: 'Not authorized: You do not own this product' });
       }
       product.title = title || product.title;
       product.price = price || product.price;
@@ -173,8 +196,11 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      if (product.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-        return res.status(401).json({ message: 'User not authorized' });
+      const isOwner = product.user.toString() === req.user._id.toString();
+      const isAdmin = req.user.role === 'admin';
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ message: 'Not authorized: You do not own this product' });
       }
       await product.deleteOne();
       res.json({ message: 'Product removed' });
@@ -262,7 +288,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'StyleSync Signature Black Hoodie',
         price: 3999,
-        category: 'tshirts',
+        category: 'T-Shirts',
         images: ['/stylesync_hoodie.png'],
         description: 'Our premium signature black hoodie featuring a subtle elegant chest logo. Heavyweight cotton blend with a tailored fit.',
         rating: 5,
@@ -274,7 +300,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'StyleSync Classic White Tee',
         price: 1499,
-        category: 'tshirts',
+        category: 'T-Shirts',
         images: ['/stylesync_tee.png'],
         description: 'The perfectly tailored white t-shirt. Designed by StyleSync for ultimate comfort and fit. 100% Supima cotton.',
         rating: 4.8,
@@ -286,7 +312,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Oversized Acid Wash Tee',
         price: 1899,
-        category: 'tshirts',
+        category: 'T-Shirts',
         images: ['https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80'],
         description: 'Vintage-inspired acid wash t-shirt with a modern oversized silhouette. Perfect for streetwear layering.',
         rating: 4.7,
@@ -298,7 +324,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Slim Fit Charcoal Work Suit',
         price: 12999,
-        category: 'shirts',
+        category: 'Shirts',
         images: ['https://images.unsplash.com/photo-1594932224491-36423ca0b13b?auto=format&fit=crop&q=80'],
         description: 'Expertly tailored charcoal suit made from Italian wool. Features a modern slim fit and premium satin lining.',
         rating: 5.0,
@@ -310,7 +336,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Chikankari Hand-Embroidered Kurta',
         price: 4499,
-        category: 'ethnic',
+        category: 'Ethnic Wear',
         images: ['https://images.unsplash.com/photo-1624314138470-5a2f24623f10?auto=format&fit=crop&q=80'],
         description: 'Authentic Lucknawi Chikankari kurta on premium georgette. Hand-crafted by master artisans with delicate thread work.',
         rating: 4.9,
@@ -322,7 +348,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Tech-Utility Cargo Joggers',
         price: 2999,
-        category: 'jeans',
+        category: 'Jeans',
         images: ['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=80'],
         description: 'Water-resistant techwear joggers with multiple utility pockets and adjustable ankle straps for a modern look.',
         rating: 4.6,
@@ -334,7 +360,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Luxe Crimson Evening Gown',
         price: 7999,
-        category: 'ethnic',
+        category: 'Ethnic Wear',
         images: ['https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&q=80'],
         description: 'A breathtaking crimson red evening gown with floor-length silhouette and elegant back detailing.',
         rating: 4.8,
@@ -346,7 +372,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Minimalist Leather Sneakers',
         price: 5499,
-        category: 'shoes',
+        category: 'Shoes',
         images: ['https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&q=80'],
         description: 'Pristine white leather sneakers with a low-top profile. The ultimate versatile footwear for any wardrobe.',
         rating: 4.9,
@@ -358,7 +384,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Bohemian Floral Maxi Skirt',
         price: 2299,
-        category: 'ethnic',
+        category: 'Ethnic Wear',
         images: ['https://images.unsplash.com/photo-1582142306909-195724d33ffc?auto=format&fit=crop&q=80'],
         description: 'Flowy maxi skirt with a vibrant bohemian floral print and comfortable elastic waistband.',
         rating: 4.5,
@@ -370,7 +396,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Handcrafted Silver Jhumkas',
         price: 1899,
-        category: 'accessories',
+        category: 'Accessories',
         images: ['https://images.unsplash.com/photo-1635767798638-3e25273a8236?auto=format&fit=crop&q=80'],
         description: 'Stunning oxidized silver jhumka earrings with intricate tribal carvings and tiny pearl bells.',
         rating: 4.8,
@@ -382,7 +408,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Active-Poly Performance Shorts',
         price: 1299,
-        category: 'jeans',
+        category: 'Jeans',
         images: ['https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80'],
         description: 'Quick-dry performance shorts with four-way stretch technology for high-intensity training.',
         rating: 4.7,
@@ -394,7 +420,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Silk Geometric Pattern Tie',
         price: 1899,
-        category: 'accessories',
+        category: 'Accessories',
         images: ['https://images.unsplash.com/photo-1589756823851-41a637330053?auto=format&fit=crop&q=80'],
         description: 'Narrow silk tie featuring a sophisticated geometric pattern in navy and silver.',
         rating: 4.9,
@@ -406,7 +432,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Tan Leather Monk Strap Shoes',
         price: 6499,
-        category: 'shoes',
+        category: 'Shoes',
         images: ['https://images.unsplash.com/photo-1614252235316-c78d0937d2f2?auto=format&fit=crop&q=80'],
         description: 'Classic double monk strap shoes in burnished tan leather. Features a durable Goodyear-welted sole.',
         rating: 4.9,
@@ -418,7 +444,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Eco-Friendly Hemp Tote',
         price: 1199,
-        category: 'accessories',
+        category: 'Accessories',
         images: ['https://images.unsplash.com/photo-1544816153-12ad5d7133a2?auto=format&fit=crop&q=80'],
         description: 'Sustainable tote bag made from high-quality hemp fibers. Durable, spacious, and perfect for daily errands.',
         rating: 4.6,
@@ -430,7 +456,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Cable Knit Cashmere Sweater',
         price: 5999,
-        category: 'shirts',
+        category: 'Shirts',
         images: ['https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80'],
         description: 'Ultra-soft cable knit sweater made from 100% Mongolian cashmere. Exceptional warmth and luxury.',
         rating: 5.0,
@@ -442,7 +468,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Distressed Indigo Denim Jacket',
         price: 3499,
-        category: 'shirts',
+        category: 'Shirts',
         images: ['https://images.unsplash.com/photo-1551537482-f2035a38ee69?auto=format&fit=crop&q=80'],
         description: 'Classic denim jacket with custom distressing and antique copper hardware. Built to last.',
         rating: 4.7,
@@ -454,7 +480,7 @@ const seedProducts = async (req, res) => {
       {
         title: 'Minimalist Faux-Leather Wallet',
         price: 1299,
-        category: 'accessories',
+        category: 'Accessories',
         images: ['https://images.unsplash.com/photo-1627123430984-705199ee99d9?auto=format&fit=crop&q=80'],
         description: 'Sleek, slim-profile wallet made from high-quality vegan leather. RFID blocking technology included.',
         rating: 4.7,

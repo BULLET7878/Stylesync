@@ -34,7 +34,16 @@ const ProductEdit = () => {
       const fetchProduct = async () => {
         try {
           const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-          const { data } = await axios.get(`${API_URL}/api/products/${id}`);
+          const config = { headers: { Authorization: `Bearer ${user.token}` } };
+          const { data } = await axios.get(`${API_URL}/api/products/${id}`, config);
+          
+          // Security Check: Verify ownership
+          if (!data.isOwner) {
+            toast.error('Access Denied: You do not have permission to edit this product');
+            navigate('/seller/dashboard');
+            return;
+          }
+
           setTitle(data.title);
           setPrice(data.price);
           setDiscountPercent(data.discountPercent || 0);
@@ -45,11 +54,12 @@ const ProductEdit = () => {
           setTags(data.tags?.join(', ') || '');
         } catch (error) {
           toast.error('Failed to fetch product details');
+          navigate('/seller/dashboard');
         }
       };
       fetchProduct();
     }
-  }, [id, isEditMode, user, navigate]);
+  }, [id, isEditMode, user, navigate, authLoading]);
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];

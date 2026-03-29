@@ -29,11 +29,19 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  paymentStatus: {
+    type: String,
+    required: true,
+    enum: ['pending', 'pending_verification', 'paid', 'failed'],
+    default: 'pending',
+  },
   paymentResult: {
     id: { type: String },
     status: { type: String },
     update_time: { type: String },
     email_address: { type: String },
+    transactionId: { type: String }, // For manual UPI / UTR
+    paymentProof: { type: String }, // URL to screenshot (optional)
   },
   itemsPrice: {
     type: Number,

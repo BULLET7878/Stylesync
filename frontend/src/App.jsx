@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -33,15 +34,21 @@ function App() {
           <Route path="shop" element={<Shop />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
-          <Route path="checkout" element={<Checkout />} />
-          <Route path="order-success" element={<OrderSuccess />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="wishlist" element={<Wishlist />} />
-          <Route path="seller/dashboard" element={<SellerDashboard />} />
-          <Route path="seller/product/new" element={<ProductEdit />} />
-          <Route path="seller/product/edit/:id" element={<ProductEdit />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+
+          {/* Auth-required routes */}
+          <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+          <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+
+          {/* Seller-only routes */}
+          <Route path="seller/dashboard" element={<ProtectedRoute requiredRole="seller"><SellerDashboard /></ProtectedRoute>} />
+          <Route path="seller/product/new" element={<ProtectedRoute requiredRole="seller"><ProductEdit /></ProtectedRoute>} />
+          <Route path="seller/product/edit/:id" element={<ProtectedRoute requiredRole="seller"><ProductEdit /></ProtectedRoute>} />
+
+          {/* Info / static pages */}
           <Route path="about" element={<Info />} />
           <Route path="careers" element={<Info />} />
           <Route path="sustainability" element={<Info />} />

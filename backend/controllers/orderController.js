@@ -1,4 +1,16 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product');
+
+// Helper to decrement stock
+const decrementStock = async (orderItems) => {
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+    if (product) {
+      product.countInStock = Math.max(0, product.countInStock - item.qty);
+      await product.save();
+    }
+  }
+};
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -27,6 +39,7 @@ const addOrderItems = async (req, res) => {
         user: req.user._id,
         shippingAddress,
         paymentMethod,
+        paymentStatus: 'pending',
         itemsPrice,
         taxPrice,
         shippingPrice,
@@ -91,7 +104,61 @@ const getSellerOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order to paid
+// @desc    Update order for manual verification (submission of UTR)
+// @route   PUT /api/orders/:id/submit-payment
+// @access  Private
+const submitPaymentDetails = async (req, res) => {
+  try {
+    const { transactionId } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.paymentResult = {
+        ...order.paymentResult,
+        transactionId,
+        status: 'PENDING_VERIFICATION',
+        update_time: new Date().toISOString(),
+      };
+      order.paymentStatus = 'pending_verification';
+      order.status = 'Processing'; // Move out of 'Pending' as buyer has acted
+
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update order to paid (By Seller/Admin)
+// @route   PUT /api/orders/:id/confirm-payment
+// @access  Private/Seller
+const confirmOrderPayment = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentStatus = 'paid';
+      order.paymentResult.status = 'PAID';
+      
+      // Decrement stock upon payment confirmation
+      await decrementStock(order.orderItems);
+      
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update order to paid (Generic/Automated)
 // @route   PUT /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = async (req, res) => {
@@ -107,6 +174,10 @@ const updateOrderToPaid = async (req, res) => {
         update_time: req.body.update_time || new Date().toISOString(),
         email_address: req.body.email_address || req.user.email,
       };
+      order.paymentStatus = 'paid';
+
+      // Decrement stock upon automated payment
+      await decrementStock(order.orderItems);
 
       const updatedOrder = await order.save();
       res.json(updatedOrder);
@@ -130,6 +201,29 @@ const updateOrderToDelivered = async (req, res) => {
       order.deliveredAt = Date.now();
       order.status = 'Delivered';
 
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Reject order payment (By Seller/Admin)
+// @route   PUT /api/orders/:id/reject-payment
+// @access  Private/Seller
+const rejectOrderPayment = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.isPaid = false;
+      order.paymentStatus = 'failed';
+      order.paymentResult.status = 'REJECTED';
+      order.status = 'Cancelled';
+      
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
@@ -239,4 +333,7 @@ module.exports = {
   updateOrderToPaid,
   updateOrderToDelivered,
   getAdminStats,
+  submitPaymentDetails,
+  confirmOrderPayment,
+  rejectOrderPayment,
 };

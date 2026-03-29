@@ -10,10 +10,32 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      fetchCart();
+      // Sync any local cart items to server on login
+      const syncLocalCart = async () => {
+        const localCart = localStorage.getItem('cartItems');
+        if (localCart) {
+          const localItems = JSON.parse(localCart);
+          if (Array.isArray(localItems) && localItems.length > 0) {
+            const config = { headers: { Authorization: `Bearer ${user.token}` } };
+            for (const item of localItems) {
+              try {
+                await axios.post(`${API_URL}/api/cart`, item, config);
+              } catch (e) { /* ignore individual item errors */ }
+            }
+            localStorage.removeItem('cartItems');
+          }
+        }
+        fetchCart();
+      };
+      syncLocalCart();
     } else {
       const localCart = localStorage.getItem('cartItems');
-      if (localCart) setCartItems(JSON.parse(localCart));
+      if (localCart) {
+        const parsed = JSON.parse(localCart);
+        setCartItems(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setCartItems([]);
+      }
     }
   }, [user]);
 
@@ -38,6 +60,10 @@ export const CartProvider = ({ children }) => {
       originalPrice: product.price || 0,
       qty 
     };
+
+    if (product.countInStock !== undefined && qty > product.countInStock) {
+      throw new Error(`Only ${product.countInStock} items available in stock`);
+    }
     
     if (user) {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };

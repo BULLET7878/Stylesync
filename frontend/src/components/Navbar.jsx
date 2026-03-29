@@ -1,142 +1,328 @@
-import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Search, LogOut, Heart } from 'lucide-react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ShoppingCart, Menu, X, Search, LogOut,
+  Heart, ChevronDown, Package, Store, User, Sparkles, Tag
+} from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import { WishlistContext } from '../context/WishlistContext';
+
+const NAV_CATEGORIES = [
+  { label: 'Shirts', value: 'Shirts' },
+  { label: 'T-Shirts', value: 'T-Shirts' },
+  { label: 'Jeans', value: 'Jeans' },
+  { label: 'Shoes', value: 'Shoes' },
+  { label: 'Accessories', value: 'Accessories' },
+  { label: 'Ethnic Wear', value: 'Ethnic Wear' },
+];
 
 const Navbar = () => {
-  const { user, logout, loading: authLoading } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
+  const { wishlist } = useContext(WishlistContext);
   const [isOpen, setIsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [searchWord, setSearchWord] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+  const profileRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsOpen(false);
+    setProfileOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchWord.trim()) {
-      navigate(`/shop?search=${searchWord}`);
+      navigate(`/shop?search=${encodeURIComponent(searchWord.trim())}`);
+      setSearchWord('');
       setIsOpen(false);
     }
   };
 
+  const cartCount = (cartItems || []).reduce((acc, item) => acc + item.qty, 0);
+
   return (
-    <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
-              <img src="/stylesync_logo.svg" alt="StyleSync" className="h-8 w-8 object-contain rounded shadow-sm mr-1 bg-white" />
-              <span className="font-bold text-xl tracking-tight text-gray-900">StyleSync</span>
+    <>
+      {/* Announcement Bar */}
+      <div className="bg-primary-600 text-white text-xs font-semibold text-center py-2 px-4 tracking-wide">
+        🎉 Free shipping on orders above ₹999 &nbsp;·&nbsp; Use code <span className="font-black underline">STYLE10</span> for 10% off
+      </div>
+
+      <nav className="bg-white sticky top-0 z-[100] border-b border-gray-200 shadow-sm">
+        {/* Main Row */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-4">
+
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shadow-md group-hover:bg-primary-700 transition-colors">
+                <img src="/stylesync_logo.svg" alt="StyleSync" className="w-5 h-5 brightness-0 invert" />
+              </div>
+              <span className="font-black text-xl tracking-tight text-gray-900 hidden sm:block">StyleSync</span>
             </Link>
-          </div>
 
-          <div className="hidden md:flex flex-1 items-center justify-center px-8">
-            <form onSubmit={handleSearch} className="w-full max-w-lg relative group">
-              <input
-                type="text"
-                placeholder="Search products, brands and categories..."
-                value={searchWord}
-                onChange={(e) => setSearchWord(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all bg-gray-50/50 group-hover:bg-white"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 group-focus-within:text-primary-500" />
+            {/* Search Bar — Desktop */}
+            <form
+              onSubmit={handleSearch}
+              className={`hidden md:flex flex-1 max-w-lg relative transition-all ${searchFocused ? 'max-w-xl' : ''}`}
+            >
+              <div className="relative w-full">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search for clothes, brands, styles..."
+                  value={searchWord}
+                  onChange={(e) => setSearchWord(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-100 border border-transparent focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 outline-none text-sm font-medium transition-all placeholder:text-gray-400"
+                />
+              </div>
             </form>
-          </div>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/shop" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Shop</Link>
-            
-            {user?.role !== 'seller' && (
-              <>
-                <Link to="/wishlist" className="text-gray-600 hover:text-primary-600 relative transition-colors">
-                  <Heart className="h-6 w-6" />
-                </Link>
-
-                <Link to="/cart" className="text-gray-600 hover:text-primary-600 relative transition-colors">
-                  <ShoppingCart className="h-6 w-6" />
-                  {cartItems.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                      {cartItems.length}
-                    </span>
-                  )}
-                </Link>
-              </>
-            )}
-
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <Link to="/dashboard" className="text-gray-600 hover:text-primary-600 flex items-center gap-1 transition-colors">
-                  <User className="h-5 w-5" />
-                  <span className="text-sm font-medium">{user.name.split(' ')[0]}</span>
-                </Link>
-                {user.role === 'seller' && (
-                  <Link to="/seller/dashboard" className="text-primary-600 hover:text-primary-700 flex items-center gap-1 transition-colors font-bold text-sm bg-primary-50 px-3 py-1 rounded-full">
-                    Seller Panel
-                  </Link>
-                )}
-                <button onClick={logout} className="text-gray-500 hover:text-red-500 transition-colors">
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link to="/register?role=seller" className="text-gray-600 hover:text-primary-600 text-sm font-medium transition-colors">
-                  Become a Seller
-                </Link>
-                <Link to="/login" className="bg-primary-600 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm hover:shadow-md">
-                  Sign In
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center md:hidden">
-            {user?.role !== 'seller' && (
-              <Link to="/cart" className="text-gray-600 hover:text-primary-600 relative mr-4">
-                <ShoppingCart className="h-6 w-6" />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItems.length}
+            {/* Right Actions */}
+            <div className="flex items-center gap-1">
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all hidden md:flex"
+                title="Wishlist"
+              >
+                <Heart className="w-5 h-5" />
+                {wishlist?.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5 border-2 border-white">
+                    {wishlist.length > 9 ? '9+' : wishlist.length}
                   </span>
                 )}
               </Link>
-            )}
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 hover:text-primary-600 focus:outline-none">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {isOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 shadow-lg absolute w-full z-40">
-          <div className="px-4 pt-2 pb-4 space-y-1">
-            <form onSubmit={handleSearch} className="mb-4 relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchWord}
-                onChange={(e) => setSearchWord(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            </form>
-            <Link to="/shop" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50" onClick={() => setIsOpen(false)}>Shop</Link>
-            {user ? (
-              <>
-                <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50" onClick={() => setIsOpen(false)}>Dashboard</Link>
-                {user.role === 'seller' && (
-                  <Link to="/seller/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:bg-primary-50" onClick={() => setIsOpen(false)}>Seller Panel</Link>
+              {/* Cart */}
+              <Link
+                to="/cart"
+                className="relative p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+                title="Cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.5 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-0.5 -right-0.5 bg-primary-600 text-white text-[9px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 border-2 border-white"
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </motion.span>
                 )}
-                <button onClick={() => { logout(); setIsOpen(false); }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50">Logout</button>
-              </>
-            ) : (
-              <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50" onClick={() => setIsOpen(false)}>Sign In</Link>
-            )}
+              </Link>
+
+              {/* User Menu */}
+              {user ? (
+                <div className="relative hidden md:block" ref={profileRef}>
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-gray-100 transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-black text-sm">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-bold text-gray-800 max-w-[80px] truncate">{user.name.split(' ')[0]}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden"
+                      >
+                        <div className="px-4 py-3 border-b border-gray-50">
+                          <p className="text-xs text-gray-400 font-medium">Signed in as</p>
+                          <p className="font-bold text-gray-900 truncate">{user.name}</p>
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mt-1 inline-block ${user.role === 'seller' ? 'bg-amber-100 text-amber-700' : 'bg-primary-100 text-primary-700'}`}>
+                            {user.role}
+                          </span>
+                        </div>
+                        <div className="py-1">
+                          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            <User className="w-4 h-4 text-gray-400" /> My Account
+                          </Link>
+                          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            <Package className="w-4 h-4 text-gray-400" /> My Orders
+                          </Link>
+                          <Link to="/wishlist" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            <Heart className="w-4 h-4 text-gray-400" /> Wishlist
+                          </Link>
+                          {user.role === 'seller' && (
+                            <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-50 transition-colors">
+                              <Store className="w-4 h-4" /> Seller Panel
+                            </Link>
+                          )}
+                        </div>
+                        <div className="border-t border-gray-50 pt-1">
+                          <button
+                            onClick={() => { logout(); setProfileOpen(false); }}
+                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" /> Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="hidden md:flex items-center gap-2">
+                  <Link to="/login" className="px-4 py-2 text-sm font-bold text-gray-700 hover:text-primary-600 transition-colors">
+                    Sign In
+                  </Link>
+                  <Link to="/register" className="px-4 py-2 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-all shadow-sm">
+                    Join Free
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile Hamburger */}
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-xl transition-all"
+              >
+                {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* Category Nav Row — Desktop */}
+        <div className="hidden md:block border-t border-gray-100 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-1 h-10 overflow-x-auto scrollbar-hide">
+              <Link
+                to="/shop"
+                className="flex-shrink-0 px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all uppercase tracking-wider"
+              >
+                All
+              </Link>
+              {NAV_CATEGORIES.map((cat) => (
+                <Link
+                  key={cat.value}
+                  to={`/shop?category=${encodeURIComponent(cat.value)}`}
+                  className="flex-shrink-0 px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all uppercase tracking-wider"
+                >
+                  {cat.label}
+                </Link>
+              ))}
+              <div className="ml-auto flex-shrink-0">
+                <Link
+                  to="/register?role=seller"
+                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all border border-amber-200"
+                >
+                  <Store className="w-3 h-3" /> Start Selling
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
+            >
+              <div className="p-4 space-y-3">
+                {/* Mobile Search */}
+                <form onSubmit={handleSearch} className="relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search styles..."
+                    value={searchWord}
+                    onChange={(e) => setSearchWord(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-100 outline-none text-sm font-medium"
+                  />
+                </form>
+
+                {/* Mobile Categories */}
+                <div className="flex flex-wrap gap-2">
+                  {NAV_CATEGORIES.map((cat) => (
+                    <Link
+                      key={cat.value}
+                      to={`/shop?category=${encodeURIComponent(cat.value)}`}
+                      className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors"
+                    >
+                      {cat.label}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="border-t border-gray-100 pt-3 space-y-1">
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white font-black">
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900 text-sm">{user.name}</p>
+                          <span className={`text-[10px] font-black uppercase ${user.role === 'seller' ? 'text-amber-600' : 'text-primary-600'}`}>{user.role}</span>
+                        </div>
+                      </div>
+                      <Link to="/dashboard" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
+                        <Package className="w-4 h-4 text-gray-400" /> My Orders
+                      </Link>
+                      <Link to="/wishlist" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
+                        <Heart className="w-4 h-4 text-gray-400" /> Wishlist
+                      </Link>
+                      {user.role === 'seller' && (
+                        <Link to="/seller/dashboard" className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 text-amber-700 font-bold text-sm">
+                          <Store className="w-4 h-4" /> Seller Panel
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => logout()}
+                        className="flex items-center gap-3 w-full p-3 rounded-xl text-red-500 hover:bg-red-50 font-medium text-sm"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to="/login" className="flex items-center justify-center p-3 rounded-xl border border-gray-200 font-bold text-sm text-gray-700">
+                        Sign In
+                      </Link>
+                      <Link to="/register" className="flex items-center justify-center p-3 rounded-xl bg-primary-600 text-white font-bold text-sm">
+                        Join Free
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import StyleAssistant from './StyleAssistant';
+
 import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
@@ -11,7 +11,7 @@ const Layout = () => {
       <main className="flex-grow">
         <Outlet />
       </main>
-      <StyleAssistant />
+
       <Footer />
     </div>
   );

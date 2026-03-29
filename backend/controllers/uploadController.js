@@ -37,16 +37,17 @@ const uploadImage = async (req, res) => {
   }
 
   try {
-    await sharp(req.file.buffer)
+    const buffer = await sharp(req.file.buffer)
       .resize(800, 1000, {
         fit: 'cover',
         position: 'center',
       })
       .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(path.join(uploadDir, filename));
+      .jpeg({ quality: 80 })
+      .toBuffer();
 
-    res.send(`/uploads/${filename}`);
+    const base64Image = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+    res.send(base64Image);
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
