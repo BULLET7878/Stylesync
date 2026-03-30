@@ -79,6 +79,13 @@ const connectDB = async () => {
       family: 4, // Force IPv4 to avoid flapping
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    
+    // Initialize GridFS
+    const gfs = new mongoose.mongo.GridFSBucket(conn.connection.db, {
+      bucketName: 'uploads'
+    });
+    app.set('gfs', gfs);
+    
     reconnectAttempts = 0;
   } catch (err) {
     console.error(`MongoDB connection error: ${err.message}`);

@@ -25,11 +25,44 @@ const uploadImage = async (req, res) => {
   }
 };
 
-// GET /api/upload/image/:id – Fallback for legacy GridFS images
+// GET /api/upload/image/:id – Serve legacy GridFS images or show fallback
 const serveImage = async (req, res) => {
-  // Instead of an error, redirect to a professional StyleSync placeholder
-  // This ensures your site always looks clean even with old product data
-  res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+  try {
+    const gfs = req.app.get('gfs');
+    if (!gfs) throw new Error('GridFS not initialized');
+
+    const { id } = req.params;
+    const mongoose = require('mongoose');
+    
+    // Check if ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+    }
+
+    const _id = new mongoose.Types.ObjectId(id);
+    
+    // Check if file exists in GridFS
+    const files = await gfs.find({ _id }).toArray();
+    if (!files || files.length === 0) {
+      // If not found in GridFS, fallback to professional placeholder
+      return res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+    }
+
+    // Set correct content type for images
+    res.set('Content-Type', files[0].contentType || 'image/jpeg');
+    
+    // Stream image from GridFS to response
+    const downloadStream = gfs.openDownloadStream(_id);
+    downloadStream.pipe(res);
+    
+    downloadStream.on('error', () => {
+      res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+    });
+
+  } catch (error) {
+    console.error('GridFS serve error:', error);
+    res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+  }
 };
 
 // DELETE /api/upload/image/:id – remove from Cloudinary
