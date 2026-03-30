@@ -11,3 +11,5 @@ _agents/
 _agent/
 brain/
 backend/uploads/
+.vercel
+.env*.local
