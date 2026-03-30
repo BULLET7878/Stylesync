@@ -28,70 +28,73 @@ const Footer = () => {
 
           </div>
 
-          {/* Shop */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Shop</h4>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "Men's Fashion", to: "/shop?category=Shirts" },
-                { label: "T-Shirts", to: "/shop?category=T-Shirts" },
-                { label: "Footwear", to: "/shop?category=Shoes" },
-                { label: "Accessories", to: "/shop?category=Accessories" },
-                { label: "Ethnic Wear", to: "/shop?category=Ethnic Wear" },
-                { label: "Sale", to: "/shop?sort=price_asc" },
-              ].map(l => (
-                <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Buyers */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyers</h4>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "My Dashboard", to: "/dashboard" },
-                { label: "Orders", to: "/dashboard" },
-                { label: "Wishlist", to: "/wishlist" },
-                { label: "Cart", to: "/cart" },
-              ].map(l => (
-                <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Sellers - Only visible to owner */}
-          {user?.email === 'rahuldhakarmm@gmail.com' && (
-            <div className="lg:col-span-2">
-              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
+          {/* Navigation Links */}
+          <div className="lg:col-span-8 flex flex-col sm:flex-row justify-between gap-10">
+            {/* Shop */}
+            <div>
+              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Shop</h4>
               <ul className="space-y-2.5 text-sm">
                 {[
-                  { label: "Seller Dashboard", to: "/seller/dashboard" },
-                  { label: "Add Product", to: "/seller/product/new" },
-                  { label: "Seller Guide", to: "/help" },
-                  { label: "Pricing", to: "/about" },
+                  { label: "Men's Fashion", to: "/shop?category=Shirts" },
+                  { label: "T-Shirts", to: "/shop?category=T-Shirts" },
+                  { label: "Footwear", to: "/shop?category=Shoes" },
+                  { label: "Accessories", to: "/shop?category=Accessories" },
+                  { label: "Ethnic Wear", to: "/shop?category=Ethnic Wear" },
+                  { label: "Sale", to: "/shop?sort=price_asc" },
                 ].map(l => (
                   <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
                 ))}
               </ul>
             </div>
-          )}
 
-          {/* Support */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Support</h4>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "Help Center", to: "/help" },
-                { label: "Shipping Info", to: "/shipping" },
-                { label: "Returns", to: "/shipping" },
-                { label: "Size Guide", to: "/size" },
-                { label: "Contact Us", to: "/contact" },
-                { label: "Privacy Policy", to: "/privacy" },
-              ].map(l => (
-                <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
+            {/* Buyers */}
+            <div>
+              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyers</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { label: "My Dashboard", to: "/dashboard" },
+                  { label: "Orders", to: "/dashboard" },
+                  { label: "Wishlist", to: "/wishlist" },
+                  { label: "Cart", to: "/cart" },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Sellers - Only visible to owner */}
+            {user?.email === 'rahuldhakarmm@gmail.com' && (
+              <div>
+                <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
+                <ul className="space-y-2.5 text-sm">
+                  {[
+                    { label: "Seller Dashboard", to: "/seller/dashboard" },
+                    { label: "Add Product", to: "/seller/product/new" },
+                    { label: "Seller Guide", to: "/help" },
+                    { label: "Pricing", to: "/about" },
+                  ].map(l => (
+                    <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Support */}
+            <div>
+              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Support</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { label: "Help Center", to: "/help" },
+                  { label: "Shipping Info", to: "/shipping" },
+                  { label: "Returns", to: "/shipping" },
+                  { label: "Size Guide", to: "/size" },
+                  { label: "Contact Us", to: "/contact" },
+                  { label: "Privacy Policy", to: "/privacy" },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
