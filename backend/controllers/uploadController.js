@@ -25,43 +25,44 @@ const uploadImage = async (req, res) => {
   }
 };
 
-// GET /api/upload/image/:id – Serve legacy GridFS images or show fallback
+// GET /api/upload/image/:id – Serve legacy GridFS images or clean placeholder
 const serveImage = async (req, res) => {
+  // Helper: send a clean "no image" SVG placeholder
+  const sendPlaceholder = () => {
+    res.set('Content-Type', 'image/svg+xml');
+    res.send(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+        <rect width="400" height="400" fill="#f3f4f6"/>
+        <rect x="140" y="130" width="120" height="100" rx="8" fill="#d1d5db"/>
+        <circle cx="165" cy="158" r="16" fill="#9ca3af"/>
+        <path d="M140 220 l50-50 30 30 30-40 50 60z" fill="#9ca3af"/>
+        <text x="200" y="270" font-family="sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle">No Image</text>
+      </svg>
+    `);
+  };
+
   try {
     const gfs = req.app.get('gfs');
-    if (!gfs) throw new Error('GridFS not initialized');
+    if (!gfs) return sendPlaceholder();
 
     const { id } = req.params;
     const mongoose = require('mongoose');
-    
-    // Check if ID is a valid MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
-    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) return sendPlaceholder();
 
     const _id = new mongoose.Types.ObjectId(id);
-    
-    // Check if file exists in GridFS
     const files = await gfs.find({ _id }).toArray();
-    if (!files || files.length === 0) {
-      // If not found in GridFS, fallback to professional placeholder
-      return res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
-    }
 
-    // Set correct content type for images
+    if (!files || files.length === 0) return sendPlaceholder();
+
     res.set('Content-Type', files[0].contentType || 'image/jpeg');
-    
-    // Stream image from GridFS to response
     const downloadStream = gfs.openDownloadStream(_id);
     downloadStream.pipe(res);
-    
-    downloadStream.on('error', () => {
-      res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
-    });
+    downloadStream.on('error', () => sendPlaceholder());
 
   } catch (error) {
     console.error('GridFS serve error:', error);
-    res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+    sendPlaceholder();
   }
 };
 
