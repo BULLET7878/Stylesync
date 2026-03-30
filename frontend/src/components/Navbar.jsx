@@ -82,9 +82,9 @@ const Navbar = () => {
               <div className="flex items-center text-gray-900 font-black">
                 <span className="text-3xl leading-none tracking-tighter mr-1 uppercase">S</span>
                 <div className="flex flex-col text-[0.55rem] leading-[1.1] uppercase tracking-[0.25em] mt-1">
-                  <span>mart</span>
-                  <span>ync</span>
-                </div>
+                <span>tyle</span>
+                <span>ync</span>
+              </div>
               </div>
             </Link>
 

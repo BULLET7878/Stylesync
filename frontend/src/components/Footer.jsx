@@ -6,7 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 const Footer = () => {
   const { user } = useContext(AuthContext);
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-16">
+    <footer className="bg-gray-900 text-gray-400 mt-auto">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
@@ -17,7 +17,7 @@ const Footer = () => {
               <div className="flex items-center text-white font-black">
                 <span className="text-3xl leading-none tracking-tighter mr-1">S</span>
                 <div className="flex flex-col text-[0.55rem] leading-[1.1] uppercase tracking-[0.25em] mt-1">
-                  <span>mart</span>
+                  <span>tyle</span>
                   <span>ync</span>
                 </div>
               </div>
