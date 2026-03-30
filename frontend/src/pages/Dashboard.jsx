@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Package, Clock, CheckCircle, XCircle, Truck, ShoppingBag, Store, ChevronRight, User, Mail, Shield } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, ShoppingBag, Store, ChevronRight, User, Math, LogOut, Heart, Edit2, Loader2, Save, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const STATUS_CONFIG = {
@@ -26,6 +26,50 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const { updateProfile } = useContext(AuthContext);
+
+  const [addressForm, setAddressForm] = useState({
+    houseNumber: '', address: '', city: '', state: '', postalCode: '', country: 'India', phone: ''
+  });
+
+  useEffect(() => {
+    if (user && user.shippingAddress) {
+      setAddressForm({
+        houseNumber: user.shippingAddress.houseNumber || '',
+        address: user.shippingAddress.address || '',
+        city: user.shippingAddress.city || '',
+        state: user.shippingAddress.state || '',
+        postalCode: user.shippingAddress.postalCode || '',
+        country: user.shippingAddress.country || 'India',
+        phone: user.phone || '',
+      });
+    }
+  }, [user]);
+
+  const handleAddressSubmit = async (e) => {
+    e.preventDefault();
+    setIsSavingAddress(true);
+    try {
+      await updateProfile({
+        phone: addressForm.phone,
+        shippingAddress: {
+          houseNumber: addressForm.houseNumber,
+          address: addressForm.address,
+          city: addressForm.city,
+          state: addressForm.state,
+          postalCode: addressForm.postalCode,
+          country: addressForm.country,
+        }
+      });
+      toast.success('Address updated successfully');
+      setIsEditingAddress(false);
+    } catch (error) {
+      toast.error('Failed to update address');
+    }
+    setIsSavingAddress(false);
+  };
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
@@ -64,8 +108,8 @@ const Dashboard = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-2xl font-black text-gray-900 mb-8">My Account</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-black text-gray-900 mb-6">My Account</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
@@ -111,6 +155,53 @@ const Dashboard = () => {
                   <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Seller Panel</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
+              )}
+            </div>
+
+            {/* Saved Address */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-primary-600" /> Shipping Address
+                </h3>
+                {!isEditingAddress && (
+                  <button onClick={() => setIsEditingAddress(true)} className="text-primary-600 hover:text-primary-700 bg-primary-50 p-1.5 rounded-lg transition-colors">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {isEditingAddress ? (
+                <form onSubmit={handleAddressSubmit} className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100 mt-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <input required value={addressForm.houseNumber} onChange={(e) => setAddressForm({...addressForm, houseNumber: e.target.value})} placeholder="House/Flat No" className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                    <input required value={addressForm.address} onChange={(e) => setAddressForm({...addressForm, address: e.target.value})} placeholder="Street/Locality" className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input required value={addressForm.city} onChange={(e) => setAddressForm({...addressForm, city: e.target.value})} placeholder="City" className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                    <input required value={addressForm.postalCode} onChange={(e) => setAddressForm({...addressForm, postalCode: e.target.value})} placeholder="Pincode" maxLength={6} className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input required value={addressForm.state} onChange={(e) => setAddressForm({...addressForm, state: e.target.value})} placeholder="State" className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                    <input required type="tel" value={addressForm.phone} onChange={(e) => setAddressForm({...addressForm, phone: e.target.value})} placeholder="Phone" className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 outline-none focus:border-primary-500" />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <button type="button" onClick={() => setIsEditingAddress(false)} className="flex-1 px-3 py-2 rounded-lg text-sm font-bold text-gray-500 border border-gray-200 hover:bg-white transition-colors">Cancel</button>
+                    <button type="submit" disabled={isSavingAddress} className="flex-1 px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-bold hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
+                      {isSavingAddress ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              ) : user.shippingAddress?.address ? (
+                <div className="text-sm text-gray-600 font-medium leading-relaxed bg-gray-50 p-3 rounded-xl">
+                  <p>{user.shippingAddress.houseNumber}, {user.shippingAddress.address}</p>
+                  <p>{user.shippingAddress.city}, {user.shippingAddress.state}</p>
+                  <p>{user.shippingAddress.postalCode}</p>
+                  <p>{user.shippingAddress.country}</p>
+                  <p className="mt-2 text-primary-600">Ph: {user.phone}</p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-xl border border-dashed border-gray-300">No address saved yet. Add one here or at checkout.</p>
               )}
             </div>
 

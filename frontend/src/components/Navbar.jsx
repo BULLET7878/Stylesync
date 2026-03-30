@@ -91,7 +91,7 @@ const Navbar = () => {
             {/* Search Bar — Desktop */}
             <form
               onSubmit={handleSearch}
-              className={`hidden md:flex flex-1 max-w-lg relative transition-all ${searchFocused ? 'max-w-xl' : ''}`}
+              className={`hidden md:flex flex-1 max-w-2xl mx-6 relative transition-all ${searchFocused ? 'max-w-3xl' : ''}`}
             >
               <div className="relative w-full">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />

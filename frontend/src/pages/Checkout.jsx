@@ -37,16 +37,19 @@ const Checkout = () => {
     if (zip.length === 6) {
       setIsZipLoading(true);
       try {
-        const { data } = await axios.get(`https://api.zippopotam.us/IN/${zip}`);
-        if (data.places && data.places.length > 0) {
-          const place = data.places[0];
-          setCity(place['place name']);
-          setState(place['state']);
-          setCountry(data['country']);
-          toast.success(`Located: ${place['place name']}, ${place['state']}`);
+        const { data } = await axios.get(`https://api.postalpincode.in/pincode/${zip}`);
+        if (data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length > 0) {
+          const postOffice = data[0].PostOffice[0];
+          setCity(postOffice.District);
+          setState(postOffice.State);
+          setCountry('India');
+          toast.success(`Located: ${postOffice.District}, ${postOffice.State}`);
+        } else {
+          toast.error('Location details not found for this pincode.');
         }
       } catch (error) {
-        console.error('Zip code lookup failed', error);
+        console.error('Pincode lookup failed', error);
+        toast.error('Could not auto-fetch address details.');
       } finally {
         setIsZipLoading(false);
       }
@@ -96,7 +99,10 @@ const Checkout = () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.post(`${API_URL}/api/coupons/validate`, { code: couponCode }, config);
+      const { data } = await axios.post(`${API_URL}/api/coupons/validate`, { 
+        code: couponCode,
+        totalAmount: itemsPrice 
+      }, config);
       
       let discount = 0;
       if (data.discountType === 'percentage') {
@@ -193,10 +199,41 @@ const Checkout = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-2/3">
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8 md:p-12">
-            <h2 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs">1</div>
-              Shipping Destination
-            </h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs">1</div>
+                Shipping Destination
+              </h2>
+              {user?.shippingAddress?.address && (
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setAddress(user.shippingAddress.address || '');
+                      setHouseNumber(user.shippingAddress.houseNumber || '');
+                      setCity(user.shippingAddress.city || '');
+                      setState(user.shippingAddress.state || '');
+                      setPostalCode(user.shippingAddress.postalCode || '');
+                      setCountry(user.shippingAddress.country || 'India');
+                      setPhone(user.phone || '');
+                      toast.success('Saved address applied!');
+                    }}
+                    className="text-xs font-bold bg-primary-50 text-primary-700 px-3 py-1.5 rounded-lg border border-primary-200 hover:bg-primary-100 transition-colors"
+                  >
+                    Use Saved
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setAddress(''); setHouseNumber(''); setCity(''); setState(''); setPostalCode(''); setPhone('');
+                    }}
+                    className="text-xs font-bold bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-white transition-colors"
+                  >
+                    Clear Form
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="space-y-6 mb-12">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 relative group">
