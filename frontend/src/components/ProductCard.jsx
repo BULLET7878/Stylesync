@@ -136,9 +136,7 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        {product.user?.name && (
-          <p className="text-[10px] text-gray-400 mt-1 truncate">by {product.user.name}</p>
-        )}
+        {/* Seller name removed for cleaner branded look */}
       </div>
     </Link>
   );
