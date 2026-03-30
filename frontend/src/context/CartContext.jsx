@@ -55,7 +55,7 @@ export const CartProvider = ({ children }) => {
     const item = { 
       product: product._id || product.product, 
       name: product.title || product.name, 
-      image: product.images && product.images.length > 0 ? product.images[0] : product.image || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80', 
+      image: product.images && product.images.length > 0 ? product.images[0] : product.image || '/assets/fallback.png',
       price: product.discountPrice > 0 ? product.discountPrice : (product.price || 0), 
       originalPrice: product.price || 0,
       qty 

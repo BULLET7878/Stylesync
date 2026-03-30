@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-const FALLBACK = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80';
+const FALLBACK = '/assets/fallback.png';
 
 const ProductDetail = () => {
   const { id } = useParams();

@@ -331,7 +331,7 @@ const Dashboard = () => {
                                 src={item.image?.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`}
                                 alt={item.name}
                                 className="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0"
-                                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }}
+                                onError={(e) => { e.target.src = '/assets/fallback.png'; }}
                               />
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>

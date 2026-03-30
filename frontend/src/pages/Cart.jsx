@@ -52,7 +52,7 @@ const Cart = () => {
                     src={item.image?.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`}
                     alt={item.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }}
+                    onError={(e) => { e.target.src = '/assets/fallback.png'; }}
                   />
                 </Link>
 

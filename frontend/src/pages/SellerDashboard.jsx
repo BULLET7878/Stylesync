@@ -196,7 +196,7 @@ const SellerDashboard = () => {
                     <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       <img src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${p.images?.[0]}`}
                         alt="" className="w-full h-full object-cover"
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }} />
+                        onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-gray-900 truncate">{p.title}</p>
@@ -283,7 +283,7 @@ const SellerDashboard = () => {
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                             <img src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${p.images?.[0]}`}
                               alt="" className="w-full h-full object-cover"
-                              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }} />
+                              onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                           </div>
                           <span className="text-sm font-bold text-gray-900 max-w-[180px] truncate">{p.title}</span>
                         </div>

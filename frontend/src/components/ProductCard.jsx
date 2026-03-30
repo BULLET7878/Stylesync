@@ -7,7 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-const FALLBACK = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80';
+const FALLBACK = '/assets/fallback.png';
 
 const ProductCard = ({ product }) => {
   const { user } = useContext(AuthContext);

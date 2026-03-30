@@ -102,7 +102,7 @@ const Home = () => {
                   src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${p.images?.[0]}`}
                   alt={p.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
-                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }}
+                  onError={(e) => { e.target.src = '/assets/fallback.png'; }}
                 />
                 <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <p className="text-white text-xs font-bold truncate">{p.title}</p>
@@ -118,8 +118,8 @@ const Home = () => {
       <section className="-mt-12 relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
-            { name: 'Men', img: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?auto=format&fit=crop&q=80', color: 'from-blue-600/40' },
-            { name: 'Women', img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80', color: 'from-pink-600/40' },
+            { name: 'Men', img: '/assets/men_hero.png', color: 'from-blue-600/40' },
+            { name: 'Women', img: '/assets/women_hero.png', color: 'from-pink-600/40' },
             { name: 'Kids', img: '/assets/kids_hero.png', color: 'from-amber-500/40' },
           ].map((sec) => (
             <Link 
