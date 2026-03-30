@@ -26,6 +26,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
+  'https://stylesync-store.vercel.app',
+  'https://stylesync-navy.vercel.app',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -33,10 +35,17 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    console.log('CORS blocked origin:', origin);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
+
+// Headers for Google OAuth popup compatibility
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
 
 // Rate limiting — auth routes only
 const authLimiter = rateLimit({

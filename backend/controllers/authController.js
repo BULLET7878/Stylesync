@@ -92,6 +92,12 @@ const getUserProfile = async (req, res) => {
 const googleLogin = async (req, res) => {
   try {
     const { token, role } = req.body;
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      console.error('GOOGLE_CLIENT_ID environment variable is NOT set!');
+      return res.status(500).json({ message: 'Server misconfiguration: Google Client ID missing' });
+    }
+
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
