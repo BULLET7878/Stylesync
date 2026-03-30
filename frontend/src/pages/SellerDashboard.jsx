@@ -47,14 +47,37 @@ const SellerDashboard = () => {
       hasFetched.current = true;
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const [pRes, oRes, sRes] = await Promise.allSettled([
-        axios.get(`${API_URL}/api/products/seller`, config),
-        axios.get(`${API_URL}/api/orders/seller`, config),
-        axios.get(`${API_URL}/api/orders/stats`, config),
-      ]);
-      if (pRes.status === 'fulfilled') setProducts(pRes.value.data);
-      if (oRes.status === 'fulfilled') setOrders(oRes.value.data);
-      if (sRes.status === 'fulfilled') setStats(sRes.value.data);
+      try {
+        const [pRes, oRes, sRes] = await Promise.allSettled([
+          axios.get(`${API_URL}/api/products/seller`, config),
+          axios.get(`${API_URL}/api/orders/seller`, config),
+          axios.get(`${API_URL}/api/orders/stats`, config),
+        ]);
+        
+        if (pRes.status === 'fulfilled') setProducts(pRes.value.data);
+        if (oRes.status === 'fulfilled') {
+          const newOrders = oRes.value.data;
+          
+          // Check for new orders to trigger popup
+          const lastOrderCount = parseInt(localStorage.getItem(`lastOrderCount_${user._id}`) || '0');
+          if (newOrders.length > lastOrderCount && lastOrderCount !== 0) {
+            toast.info('🎉 New Order Arrived! Check your orders tab.', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "colored",
+            });
+          }
+          localStorage.setItem(`lastOrderCount_${user._id}`, newOrders.length.toString());
+          setOrders(newOrders);
+        }
+        if (sRes.status === 'fulfilled') setStats(sRes.value.data);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+      }
       setLoading(false);
     };
     fetchData();

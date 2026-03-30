@@ -96,9 +96,19 @@ const getSellerOrders = async (req, res) => {
     // Find orders that contain any of these products
     const orders = await Order.find({
       'orderItems.product': { $in: productIds }
-    }).populate('user', 'name email');
+    }).populate('user', 'name email').sort({ createdAt: -1 });
 
-    res.json(orders);
+    // Privacy Masking: Remove sensitive address fields for sellers
+    const maskedOrders = orders.map(order => {
+      const o = order.toObject();
+      if (o.shippingAddress) {
+        o.shippingAddress.address = '*** Masked for Privacy ***';
+        o.shippingAddress.houseNumber = '***';
+      }
+      return o;
+    });
+
+    res.json(maskedOrders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

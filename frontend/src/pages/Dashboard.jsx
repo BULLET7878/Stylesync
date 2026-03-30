@@ -252,6 +252,29 @@ const Dashboard = () => {
                   <ShoppingBag className="w-5 h-5 text-primary-600" /> 
                   {user.role === 'seller' ? 'Order Management' : 'Order History'}
                 </h2>
+
+                {/* Purchased Products Summary (Buyer only) */}
+                {user.role === 'buyer' && orders.length > 0 && (
+                  <div className="mb-10">
+                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">My Collection</h3>
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                      {Array.from(new Set(orders.map(o => o.orderItems.map(i => JSON.stringify({id: i.product, name: i.name, img: i.image}))).flat()))
+                        .map(itemStr => {
+                          const item = JSON.parse(itemStr);
+                          return (
+                            <Link key={item.id} to={`/product/${item.id}`} className="flex-shrink-0 group">
+                              <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 group-hover:border-primary-400 transition-colors">
+                                <img src={item.img?.startsWith('http') ? item.img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.img}`} 
+                                  className="w-full h-full object-cover" 
+                                  alt={item.name}
+                                  onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
+                              </div>
+                            </Link>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
                 {user.role === 'seller' && (
                   <div className="flex bg-gray-100 p-1 rounded-xl">
                     <button 
@@ -339,12 +362,22 @@ const Dashboard = () => {
                               </div>
                               <div className="flex flex-col items-end gap-2">
                                 <p className="text-sm font-bold text-gray-900 flex-shrink-0">₹{(item.qty * item.price).toLocaleString()}</p>
-                                <button 
-                                  onClick={() => handleReorder(item)}
-                                  className="text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1 rounded-lg transition-all"
-                                >
-                                  Buy Again
-                                </button>
+                                <div className="flex gap-2">
+                                  {order.status === 'Delivered' && (
+                                    <Link 
+                                      to={`/product/${item.product}#reviews`}
+                                      className="text-[10px] font-black uppercase tracking-widest bg-yellow-400 text-gray-900 px-3 py-1 rounded-lg hover:bg-yellow-500 transition-all"
+                                    >
+                                      Write Review
+                                    </Link>
+                                  )}
+                                  <button 
+                                    onClick={() => handleReorder(item)}
+                                    className="text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1 rounded-lg transition-all"
+                                  >
+                                    Buy Again
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}

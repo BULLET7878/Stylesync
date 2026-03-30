@@ -52,7 +52,14 @@ const ProductDetail = () => {
       setLoading(false);
     };
     fetchProduct();
-    window.scrollTo(0, 0);
+    if (window.location.hash === '#reviews') {
+      setTimeout(() => {
+        const el = document.getElementById('reviews-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 800);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [id]);
 
   const handleAddToCart = () => {
@@ -304,7 +311,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Reviews */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 mb-10">
+        <div id="reviews-section" className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 mb-10">
           <h2 className="text-xl font-black text-gray-900 mb-6">Customer Reviews</h2>
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Rating Summary */}
