@@ -14,7 +14,7 @@ export const WishlistProvider = ({ children }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -43,7 +43,7 @@ export const WishlistProvider = ({ children }) => {
       return;
     }
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -59,7 +59,7 @@ export const WishlistProvider = ({ children }) => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,

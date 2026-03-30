@@ -6,7 +6,7 @@ import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
 const FALLBACK = '/assets/fallback.png';
 
 const ProductCard = ({ product }) => {

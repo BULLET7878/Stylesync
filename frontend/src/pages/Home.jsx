@@ -35,7 +35,7 @@ const Home = () => {
       const ids = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
       if (ids.length > 0) {
         try {
-          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+          const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
           const results = await Promise.allSettled(ids.map(id => axios.get(`${API_URL}/api/products/${id}`)));
           setRecentlyViewed(results.filter(r => r.status === 'fulfilled').map(r => r.value.data));
         } catch (e) { /* silent */ }
@@ -98,7 +98,7 @@ const Home = () => {
                 className={`relative overflow-hidden rounded-2xl aspect-square bg-gray-800 group ${i === 0 ? 'col-span-2 aspect-video' : ''}`}
               >
                 <img
-                  src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5001'}/${p.images?.[0]?.replace(/^\//, '')}`}
+                  src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001')).replace(/\/$/, '')}/${p.images?.[0]?.replace(/^\//, '')}`}
                   alt={p.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                   onError={(e) => { e.target.src = '/assets/fallback.png'; }}

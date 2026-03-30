@@ -25,9 +25,11 @@ const uploadImage = async (req, res) => {
   }
 };
 
-// GET /api/upload/image/:id – Deprecated, Cloudinary provides full URLs
+// GET /api/upload/image/:id – Fallback for legacy GridFS images
 const serveImage = async (req, res) => {
-  res.status(410).json({ message: 'This endpoint is deprecated. Use direct Cloudinary URLs.' });
+  // Instead of an error, redirect to a professional StyleSync placeholder
+  // This ensures your site always looks clean even with old product data
+  res.redirect('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
 };
 
 // DELETE /api/upload/image/:id – remove from Cloudinary

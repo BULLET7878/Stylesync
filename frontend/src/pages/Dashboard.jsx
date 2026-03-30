@@ -77,7 +77,7 @@ const Dashboard = () => {
     if (!user) { navigate('/login'); return; }
     const fetchOrders = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
         const { data: myOrders } = await axios.get(`${API_URL}/api/orders/myorders`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
@@ -91,7 +91,7 @@ const Dashboard = () => {
   const handleUpgrade = async () => {
     setUpgrading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const { data } = await axios.put(`${API_URL}/api/users/upgrade`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
@@ -124,7 +124,7 @@ const Dashboard = () => {
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm('Cancel this order?')) return;
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       await axios.put(`${API_URL}/api/orders/${orderId}/cancel`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
@@ -288,7 +288,7 @@ const Dashboard = () => {
                         return (
                           <Link key={item.id} to={`/product/${item.id}`} className="flex-shrink-0 group">
                             <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 group-hover:border-primary-400 transition-colors">
-                              <img src={item.img?.startsWith('http') ? item.img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.img}`} 
+                              <img src={item.img?.startsWith('http') ? item.img : `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001')).replace(/\/$/, '')}/${item.img?.replace(/^\//, '')}`} 
                                 className="w-full h-full object-cover" 
                                 alt={item.name}
                                 onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
@@ -356,7 +356,7 @@ const Dashboard = () => {
                           {order.orderItems.map((item, i) => (
                             <div key={i} className="flex items-center gap-3">
                               <img
-                                src={item.image?.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`}
+                                src={item.image?.startsWith('http') ? item.image : `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001')).replace(/\/$/, '')}/${item.image?.replace(/^\//, '')}`}
                                 alt={item.name}
                                 className="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0"
                                 onError={(e) => { e.target.src = '/assets/fallback.png'; }}

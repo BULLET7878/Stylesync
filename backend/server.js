@@ -39,7 +39,11 @@ app.use(cors({
     // In development, allow all origins to facilitate testing on local network devices
     if (process.env.NODE_ENV !== 'production') return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // In production, allow specific origins OR any Vercel subdomain
+    const isVercel = origin.endsWith('.vercel.app');
+    if (allowedOrigins.includes(origin) || isVercel) {
+      return callback(null, true);
+    }
     
     console.log('CORS blocked origin:', origin);
     callback(new Error('Not allowed by CORS'));

@@ -291,7 +291,7 @@ const ListProductCard = ({ product }) => {
   const isWishlisted = isInWishlist(product._id);
   const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
-  const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
   const imgSrc = product.images?.[0]?.startsWith('http') 
     ? product.images[0] 
     : `${API.replace(/\/$/, '')}/${product.images?.[0]?.replace(/^\//, '')}`;

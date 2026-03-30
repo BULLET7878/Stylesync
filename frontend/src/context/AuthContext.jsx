@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
 
   const login = async (email, password) => {
     const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password });

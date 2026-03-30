@@ -98,7 +98,7 @@ const Checkout = () => {
     }
     setIsCouponLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
       const { data } = await axios.post(`${API_URL}/api/coupons/validate`, { 
         code: couponCode,
@@ -146,7 +146,7 @@ const Checkout = () => {
 
     try {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       
       // 1. Create Order
       const { data: order } = await axios.post(`${API_URL}/api/orders`, {
@@ -352,7 +352,7 @@ const Checkout = () => {
                 <div key={item.product} className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative">
                     <img
-                      src={item.image?.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`}
+                      src={item.image?.startsWith('http') ? item.image : `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001')).replace(/\/$/, '')}/${item.image?.replace(/^\//, '')}`}
                       alt={item.name}
                       className="w-full h-full object-cover"
                       onError={(e) => { e.target.src = '/assets/fallback.png'; }}

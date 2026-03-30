@@ -34,7 +34,7 @@ const ProductEdit = () => {
     if (isEditMode) {
       const fetchProduct = async () => {
         try {
-          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+          const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
           const config = { headers: { Authorization: `Bearer ${user.token}` } };
           const { data } = await axios.get(`${API_URL}/api/products/${id}`, config);
           
@@ -76,7 +76,7 @@ const ProductEdit = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const { data } = await axios.post(`${API_URL}/api/upload`, formData, config);
       // API now returns { imageUrl: '/api/upload/image/<id>' }
       const imageUrl = data.imageUrl || data;
@@ -120,7 +120,7 @@ const ProductEdit = () => {
         },
       };
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       if (isEditMode) {
         await axios.put(`${API_URL}/api/products/${id}`, productData, config);
         toast.success('Product updated successfully');
@@ -275,8 +275,8 @@ const ProductEdit = () => {
               <label className="block text-sm font-bold text-gray-700 mb-2">Product Images</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 {images.map((img, idx) => {
-                  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-                  const src = img?.startsWith('http') ? img : `${API_URL}${img}`;
+                  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
+                  const src = img?.startsWith('http') ? img : `${API_URL.replace(/\/$/, '')}/${img?.replace(/^\//, '')}`;
                   return (
                     <div key={idx} className="relative aspect-[4/5] rounded-xl overflow-hidden border border-gray-100 group">
                       <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
