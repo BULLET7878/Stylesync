@@ -225,12 +225,12 @@ const Navbar = () => {
         {/* Category Nav Row — Desktop */}
         <div className="hidden md:block border-t border-gray-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 h-10 overflow-x-auto scrollbar-hide py-1">
+            <div className="flex items-center gap-1 h-10 overflow-x-auto scrollbar-hide py-1">
               {['All', 'Men', 'Women', 'Kids', 'Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
                 <Link
                   key={cat}
                   to={cat === 'All' ? '/shop' : (['Men', 'Women', 'Kids'].includes(cat) ? `/shop?section=${cat}` : `/shop?category=${cat}`)}
-                  className="whitespace-nowrap px-4 py-1 text-[11px] font-bold text-gray-500 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-widest"
+                  className="whitespace-nowrap px-3 py-1 text-[10px] font-black text-gray-500 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.15em]"
                 >
                   {cat}
                 </Link>
