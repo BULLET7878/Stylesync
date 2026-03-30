@@ -19,8 +19,8 @@ const Info = () => {
           <p className="text-xl leading-relaxed text-gray-700 font-medium">StyleSync was born from a simple observation: fashion is personal, but finding the right fit shouldn't be a struggle.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-gray-50 p-6 rounded-2xl">
-              <h3 className="text-lg font-bold mb-3">AI Discovery</h3>
-              <p className="text-gray-600">We utilize cutting-edge AI to understand your unique measurements and style preferences, connecting you with products that truly fit.</p>
+              <h3 className="text-lg font-bold mb-3">Smart Discovery</h3>
+              <p className="text-gray-600">We utilize advanced personalization to understand your unique measurements and style preferences, connecting you with products that truly fit.</p>
             </div>
             <div className="bg-gray-50 p-6 rounded-2xl">
               <h3 className="text-lg font-bold mb-3">Direct-to-Buyer</h3>
@@ -37,7 +37,7 @@ const Info = () => {
         <div className="space-y-6 text-gray-600">
           <p className="text-lg">We're always looking for visionaries at the intersection of fashion, technology, and sustainability.</p>
           <div className="border-t border-gray-100 pt-6 space-y-4">
-            {['AI / ML Engineer', 'Senior UI/UX Designer', 'Growth Marketing Lead', 'Supply Chain Specialist'].map(job => (
+            {['Creative Director', 'Senior UI/UX Designer', 'Growth Marketing Lead', 'Supply Chain Specialist'].map(job => (
               <div key={job} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl hover:border-primary-500 hover:bg-primary-50/30 transition-all cursor-pointer group">
                 <span className="font-bold text-gray-900">{job}</span>
                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />

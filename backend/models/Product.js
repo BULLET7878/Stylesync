@@ -59,7 +59,7 @@ const productSchema = new mongoose.Schema({
     default: 0,
   },
   reviews: [reviewSchema],
-  tags: [String], // for AI outfit pairing: e.g., ['summer', 'casual']
+  tags: [String], // for curated styling: e.g., ['summer', 'casual']
   countInStock: {
     type: Number,
     required: true,
