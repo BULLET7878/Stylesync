@@ -79,12 +79,14 @@ const Home = () => {
               >
                 Shop Now <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link
-                to="/register?role=seller"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-xl font-bold text-base hover:bg-white/20 transition-all backdrop-blur-sm"
-              >
-                Start Selling Free
-              </Link>
+              {user?.email === 'rahuldhakarmm@gmail.com' && (
+                <Link
+                  to="/seller/dashboard"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-xl font-bold text-base hover:bg-white/20 transition-all backdrop-blur-sm"
+                >
+                  Seller Panel
+                </Link>
+              )}
             </div>
           </div>
 
@@ -280,27 +282,28 @@ const Home = () => {
       </section>
 
       {/* ── Seller CTA ── */}
-      {(!user || user.role === 'buyer') && (
+      {/* Seller CTA - Only visible to owner */}
+      {user?.email === 'rahuldhakarmm@gmail.com' && (
         <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-10 lg:p-14">
               <span className="text-4xl mb-4 block">🛍️</span>
-              <h2 className="text-3xl font-black text-gray-900 mb-3">Got something to sell?</h2>
+              <h2 className="text-3xl font-black text-gray-900 mb-3">Seller Controls</h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Join thousands of sellers on StyleSync. List your products for free and reach lakhs of fashion-forward buyers.
+                Manage your products, track orders, and view your seller performance details here.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  to="/register?role=seller"
+                  to="/seller/dashboard"
                   className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white px-8 py-4 rounded-xl font-black hover:bg-amber-600 transition-all shadow-lg"
                 >
-                  Start Selling — It's Free
+                  Open Seller Dashboard
                 </Link>
                 <Link
-                  to="/about"
+                  to="/seller/product/new"
                   className="inline-flex items-center justify-center gap-2 border border-amber-300 text-amber-700 px-8 py-4 rounded-xl font-bold hover:bg-amber-50 transition-all"
                 >
-                  Learn More
+                  Add New Product
                 </Link>
               </div>
             </div>

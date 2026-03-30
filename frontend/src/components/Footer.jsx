@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const Footer = () => {
+  const { user } = useContext(AuthContext);
   return (
     <footer className="bg-gray-900 text-gray-400">
       {/* Main Footer */}
@@ -43,21 +45,22 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Sellers */}
-          <div>
-            <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { label: "Start Selling", to: "/register?role=seller" },
-                { label: "Seller Dashboard", to: "/seller/dashboard" },
-                { label: "Add Product", to: "/seller/product/new" },
-                { label: "Seller Guide", to: "/help" },
-                { label: "Pricing", to: "/about" },
-              ].map(l => (
-                <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-          </div>
+          {/* Sellers - Only visible to owner */}
+          {user?.email === 'rahuldhakarmm@gmail.com' && (
+            <div>
+              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { label: "Seller Dashboard", to: "/seller/dashboard" },
+                  { label: "Add Product", to: "/seller/product/new" },
+                  { label: "Seller Guide", to: "/help" },
+                  { label: "Pricing", to: "/about" },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Support */}
           <div>
