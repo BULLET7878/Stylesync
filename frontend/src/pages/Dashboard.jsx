@@ -155,7 +155,7 @@ const Dashboard = () => {
               {user.role === 'seller' && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Total Sales</span>
-                  <span className="font-black text-indigo-600">{sellerOrders.length}</span>
+                  <span className="font-black text-indigo-600">{orders.length}</span>
                 </div>
               )}
               <div className="flex items-center justify-between text-sm">

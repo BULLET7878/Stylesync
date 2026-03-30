@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles, Clock, ShieldCheck, Truck, RefreshCw, Star, TrendingUp, Tag } from 'lucide-react';
 import { ProductContext } from '../context/ProductContext';

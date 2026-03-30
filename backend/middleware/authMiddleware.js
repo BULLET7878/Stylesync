@@ -23,13 +23,8 @@ const protect = async (req, res, next) => {
 const OWNER_EMAIL = 'rahuldhakarmm@gmail.com';
 
 const seller = (req, res, next) => {
-  if (req.user && (req.user.email === OWNER_EMAIL || req.user.role === 'seller' || req.user.role === 'admin')) {
-    // Additionally verify if it's the specific owner email as requested
-    if (req.user.email === OWNER_EMAIL) {
-       next();
-    } else {
-       res.status(401).json({ message: 'Not authorized as a seller. Only the owner can sell.' });
-    }
+  if (req.user && (req.user.role === 'seller' || req.user.role === 'admin')) {
+    next();
   } else {
     res.status(401).json({ message: 'Not authorized as a seller' });
   }

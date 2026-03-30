@@ -62,8 +62,8 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Sellers - Only visible to owner */}
-            {user?.email === 'rahuldhakarmm@gmail.com' && (
+            {/* Sellers - Visible to sellers */}
+            {user?.role === 'seller' && (
               <div>
                 <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
                 <ul className="space-y-2.5 text-sm">

@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
+      role: role === 'seller' ? 'seller' : 'buyer',
     });
 
     if (user) {
@@ -29,6 +29,8 @@ const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone,
+        shippingAddress: user.shippingAddress,
         token: generateToken(user._id),
       });
     } else {
@@ -54,6 +56,8 @@ const authUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone,
+        shippingAddress: user.shippingAddress,
         token: generateToken(user._id),
       });
     } else {
@@ -111,12 +115,8 @@ const googleLogin = async (req, res) => {
         name,
         email,
         password: Math.random().toString(36).slice(-10) + 'A1!',
-        role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
+        role: 'buyer',
       });
-    } else if (email === 'rahuldhakarmm@gmail.com' && user.role !== 'seller') {
-      // Ensure owner has correct role
-      user.role = 'seller';
-      await user.save();
     }
 
     res.json({
@@ -124,6 +124,8 @@ const googleLogin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      shippingAddress: user.shippingAddress,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -160,7 +162,24 @@ const getUserCount = async (req, res) => {
 // @route   PUT /api/users/upgrade
 // @access  Private
 const upgradeToSeller = async (req, res) => {
-  res.status(403).json({ message: 'Seller registration is currently closed. Only the primary administrator is authorized to sell on this platform.' });
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.role === 'seller') return res.status(400).json({ message: 'Already a seller' });
+    user.role = 'seller';
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      phone: updatedUser.phone,
+      shippingAddress: updatedUser.shippingAddress,
+      token: generateToken(updatedUser._id),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // @desc    Update user profile
