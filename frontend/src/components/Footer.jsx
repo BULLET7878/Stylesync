@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, ExternalLink } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const Footer = () => {
   const { user } = useContext(AuthContext);
+  const { pathname } = useLocation();
+  const isSellerPage = pathname.startsWith('/seller');
+
   return (
     <footer className="bg-gray-900 text-gray-400 mt-auto">
       {/* Main Footer */}
@@ -23,75 +25,96 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-sm leading-relaxed mb-5 max-w-xs">
-              India's modern fashion marketplace. Discover curated styles from independent sellers and top brands.
+              {isSellerPage 
+                ? "StyleSync Business Portal. Empowering independent sellers with premium fashion management tools."
+                : "India's modern fashion marketplace. Discover curated styles from independent sellers and top brands."}
             </p>
-
           </div>
 
           {/* Navigation Links */}
           <div className="lg:col-span-8 flex flex-col sm:flex-row justify-between gap-10">
-            {/* Shop */}
-            <div>
-              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Shop</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[
-                  { label: "Men's Fashion", to: "/shop?category=Shirts" },
-                  { label: "T-Shirts", to: "/shop?category=T-Shirts" },
-                  { label: "Footwear", to: "/shop?category=Shoes" },
-                  { label: "Accessories", to: "/shop?category=Accessories" },
-                  { label: "Ethnic Wear", to: "/shop?category=Ethnic Wear" },
-                  { label: "Sale", to: "/shop?sort=price_asc" },
-                ].map(l => (
-                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-                ))}
-              </ul>
-            </div>
+            {!isSellerPage ? (
+              <>
+                {/* Shop */}
+                <div>
+                  <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Shop</h4>
+                  <ul className="space-y-2.5 text-sm">
+                    {[
+                      { label: "Men's Fashion", to: "/shop?category=Shirts" },
+                      { label: "T-Shirts", to: "/shop?category=T-Shirts" },
+                      { label: "Footwear", to: "/shop?category=Shoes" },
+                      { label: "Accessories", to: "/shop?category=Accessories" },
+                      { label: "Ethnic Wear", to: "/shop?category=Ethnic Wear" },
+                      { label: "Sale", to: "/shop?sort=price_asc" },
+                    ].map(l => (
+                      <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
 
-            {/* Buyers */}
-            <div>
-              <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyers</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[
-                  { label: "My Dashboard", to: "/dashboard" },
-                  { label: "Orders", to: "/dashboard" },
-                  { label: "Wishlist", to: "/wishlist" },
-                  { label: "Cart", to: "/cart" },
-                ].map(l => (
-                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Sellers - Visible to sellers */}
-            {user?.role === 'seller' && (
-              <div>
-                <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
-                <ul className="space-y-2.5 text-sm">
-                  {[
-                    { label: "Seller Dashboard", to: "/seller/dashboard" },
-                    { label: "Add Product", to: "/seller/product/new" },
-                    { label: "Seller Guide", to: "/help" },
-                    { label: "Pricing", to: "/about" },
-                  ].map(l => (
-                    <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
-                  ))}
-                </ul>
-              </div>
+                {/* Account/Personal */}
+                <div>
+                  <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">My Account</h4>
+                  <ul className="space-y-2.5 text-sm">
+                    {[
+                      { label: "Dashboard", to: "/dashboard" },
+                      { label: "My Orders", to: "/dashboard" },
+                      { label: "Wishlist", to: "/wishlist" },
+                      { label: "Cart", to: "/cart" },
+                    ].map(l => (
+                      <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              /* Seller Specific Sections */
+              <>
+                <div>
+                  <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Manage Store</h4>
+                  <ul className="space-y-2.5 text-sm">
+                    {[
+                      { label: "Business Dashboard", to: "/seller/dashboard" },
+                      { label: "Inventory Management", to: "/seller/dashboard" },
+                      { label: "Add New Product", to: "/seller/product/new" },
+                      { label: "Store Settings", to: "/seller/dashboard" },
+                    ].map(l => (
+                      <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Business Support</h4>
+                  <ul className="space-y-2.5 text-sm">
+                    {[
+                      { label: "Seller University", to: "/help" },
+                      { label: "Pricing & Fees", to: "/about" },
+                      { label: "Shipping Policy", to: "/shipping" },
+                      { label: "Account Health", to: "/dashboard" },
+                    ].map(l => (
+                      <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
+              </>
             )}
 
-            {/* Support */}
+            {/* Support / Global Links */}
             <div>
               <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Support</h4>
               <ul className="space-y-2.5 text-sm">
                 {[
                   { label: "Help Center", to: "/help" },
-                  { label: "Shipping Info", to: "/shipping" },
-                  { label: "Returns", to: "/shipping" },
-                  { label: "Size Guide", to: "/size" },
                   { label: "Contact Us", to: "/contact" },
                   { label: "Privacy Policy", to: "/privacy" },
+                  { label: "Back to Shop", to: "/", external: true },
                 ].map(l => (
-                  <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+                  <li key={l.label}>
+                    <Link to={l.to} className="hover:text-white transition-colors flex items-center gap-1.5">
+                      {l.label} {l.external && <ExternalLink className="w-3 h-3" />}
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>

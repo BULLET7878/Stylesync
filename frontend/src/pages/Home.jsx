@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Clock, ShieldCheck, Truck, RefreshCw, Star, TrendingUp, Tag } from 'lucide-react';
 import { ProductContext } from '../context/ProductContext';
 import { AuthContext } from '../context/AuthContext';
@@ -29,7 +29,6 @@ const Home = () => {
   const { products, loading } = useContext(ProductContext);
   const { user } = useContext(AuthContext);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRecentlyViewed = async () => {
@@ -79,7 +78,7 @@ const Home = () => {
               >
                 Shop Now <ArrowRight className="w-4 h-4" />
               </Link>
-              {user?.email === 'rahuldhakarmm@gmail.com' && (
+              {user?.role === 'seller' && (
                 <Link
                   to="/seller/dashboard"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-xl font-bold text-base hover:bg-white/20 transition-all backdrop-blur-sm"
