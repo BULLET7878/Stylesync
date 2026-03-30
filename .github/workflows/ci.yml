@@ -36,7 +36,6 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Fallback values so build never fails due to missing secrets
           VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://stylesync-navy.vercel.app' }}
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID || '' }}
           VITE_SELLER_UPI_ID: ${{ secrets.VITE_SELLER_UPI_ID || '' }}
