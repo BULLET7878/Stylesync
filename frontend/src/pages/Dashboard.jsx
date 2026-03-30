@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Package, Clock, CheckCircle, XCircle, Truck, ShoppingBag, Store, ChevronRight, User, Math, LogOut, Heart, Edit2, Loader2, Save, X } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, ShoppingBag, Store, ChevronRight, User, LogOut, Heart, Edit2, Loader2, Save, X } from 'lucide-react';
+import { CartContext } from '../context/CartContext';
 import { toast } from 'react-toastify';
 
 const STATUS_CONFIG = {
@@ -24,11 +25,14 @@ const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [sellerOrders, setSellerOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState('purchases');
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const { updateProfile } = useContext(AuthContext);
+  const { addToCart } = useContext(CartContext);
 
   const [addressForm, setAddressForm] = useState({
     houseNumber: '', address: '', city: '', state: '', postalCode: '', country: 'India', phone: ''
@@ -75,11 +79,18 @@ const Dashboard = () => {
     if (!user) { navigate('/login'); return; }
     const fetchOrders = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-        const { data } = await axios.get(`${API_URL}/api/orders/myorders`, {
+        const { data: myOrders } = await axios.get(`${API_URL}/api/orders/myorders`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
-        setOrders(data);
+        setOrders(myOrders);
+
+        if (user.role === 'seller') {
+          const { data: sOrders } = await axios.get(`${API_URL}/api/orders/seller`, {
+            headers: { Authorization: `Bearer ${user.token}` }
+          });
+          setSellerOrders(sOrders);
+          if (myOrders.length === 0 && sOrders.length > 0) setActiveTab('sales');
+        }
       } catch (e) { console.error(e); }
       setLoading(false);
     };
@@ -100,6 +111,24 @@ const Dashboard = () => {
       toast.error(err.response?.data?.message || 'Upgrade failed');
     }
     setUpgrading(false);
+  };
+
+  const handleReorder = async (item) => {
+    try {
+      // Create a mock product object that addToCart expects
+      const productObj = {
+        _id: item.product,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        countInStock: 99 // Assume stock is available, backend will verify
+      };
+      await addToCart(productObj, 1);
+      toast.success(`${item.name} added to cart!`);
+      navigate('/checkout');
+    } catch (error) {
+      toast.error(error.message || 'Failed to reorder');
+    }
   };
 
   if (!user) return null;
@@ -129,16 +158,18 @@ const Dashboard = () => {
             {/* Stats */}
             <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Total Orders</span>
+                <span className="text-gray-500">{user.role === 'seller' ? 'My Purchases' : 'Total Orders'}</span>
                 <span className="font-black text-gray-900">{orders.length}</span>
               </div>
+              {user.role === 'seller' && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Total Sales</span>
+                  <span className="font-black text-indigo-600">{sellerOrders.length}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Total Spent</span>
                 <span className="font-black text-gray-900">₹{totalSpent.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Delivered</span>
-                <span className="font-black text-green-600">{orders.filter(o => o.isDelivered).length}</span>
               </div>
             </div>
 
@@ -216,26 +247,54 @@ const Dashboard = () => {
           {/* Orders */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h2 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-primary-600" /> Order History
-              </h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5 text-primary-600" /> 
+                  {user.role === 'seller' ? 'Order Management' : 'Order History'}
+                </h2>
+                {user.role === 'seller' && (
+                  <div className="flex bg-gray-100 p-1 rounded-xl">
+                    <button 
+                      onClick={() => setActiveTab('purchases')}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'purchases' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+                    >
+                      My Purchases
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab('sales')}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'sales' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}
+                    >
+                      Recent Sales
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {loading ? (
                 <div className="space-y-3">
                   {[1,2,3].map(n => <div key={n} className="skeleton rounded-xl h-28" />)}
                 </div>
-              ) : orders.length === 0 ? (
+              ) : (activeTab === 'purchases' ? orders : sellerOrders).length === 0 ? (
                 <div className="text-center py-16 border-2 border-dashed border-gray-100 rounded-2xl">
                   <Package className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-1">No orders yet</h3>
-                  <p className="text-gray-500 text-sm mb-5">Your orders will appear here once you shop.</p>
-                  <Link to="/shop" className="bg-primary-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-700 transition-all">
-                    Start Shopping
+                  <h3 className="font-bold text-gray-900 mb-1">
+                    {activeTab === 'purchases' ? 'No purchases yet' : 'No sales yet'}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-5">
+                    {activeTab === 'purchases' 
+                      ? 'Your orders will appear here once you shop.' 
+                      : 'Received orders will appear here once customers buy your products.'}
+                  </p>
+                  <Link 
+                    to={activeTab === 'purchases' ? "/shop" : "/seller/dashboard"} 
+                    className="bg-primary-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-700 transition-all"
+                  >
+                    {activeTab === 'purchases' ? 'Start Shopping' : 'Manage Inventory'}
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {orders.map(order => {
+                  {(activeTab === 'purchases' ? orders : sellerOrders).map(order => {
                     const statusCfg = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pending'];
                     const paymentCfg = PAYMENT_CONFIG[order.paymentStatus] || PAYMENT_CONFIG['pending'];
                     return (
@@ -278,7 +337,15 @@ const Dashboard = () => {
                                 <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
                                 <p className="text-xs text-gray-500">Qty: {item.qty} × ₹{item.price.toLocaleString()}</p>
                               </div>
-                              <p className="text-sm font-bold text-gray-900 flex-shrink-0">₹{(item.qty * item.price).toLocaleString()}</p>
+                              <div className="flex flex-col items-end gap-2">
+                                <p className="text-sm font-bold text-gray-900 flex-shrink-0">₹{(item.qty * item.price).toLocaleString()}</p>
+                                <button 
+                                  onClick={() => handleReorder(item)}
+                                  className="text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1 rounded-lg transition-all"
+                                >
+                                  Buy Again
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>

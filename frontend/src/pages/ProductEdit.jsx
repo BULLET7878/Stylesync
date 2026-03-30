@@ -15,7 +15,8 @@ const ProductEdit = () => {
   const [price, setPrice] = useState(899);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('tshirts');
+  const [category, setCategory] = useState('Shirts');
+  const [section, setSection] = useState('Unisex');
   const [countInStock, setCountInStock] = useState(1);
   const [images, setImages] = useState([]);
   const [tags, setTags] = useState('');
@@ -49,6 +50,7 @@ const ProductEdit = () => {
           setDiscountPercent(data.discountPercent || 0);
           setDescription(data.description);
           setCategory(data.category);
+          setSection(data.section || 'Unisex');
           setCountInStock(data.countInStock);
           setImages(data.images);
           setTags(data.tags?.join(', ') || '');
@@ -104,6 +106,7 @@ const ProductEdit = () => {
       discountPercent: Number(discountPercent),
       description,
       category,
+      section,
       countInStock: Number(countInStock),
       images,
       tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
@@ -219,6 +222,20 @@ const ProductEdit = () => {
             </div>
 
             <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Section</label>
+              <select
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-indigo-50/30 border-indigo-100"
+                value={section}
+                onChange={(e) => setSection(e.target.value)}
+              >
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Kids">Kids</option>
+                <option value="Unisex">Unisex</option>
+              </select>
+            </div>
+
+            <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Stock Inventory</label>
               <input
                 type="number"
@@ -231,7 +248,7 @@ const ProductEdit = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Tags (AI Metadata)</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Product Search Tags</label>
               <input
                 type="text"
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -282,8 +299,8 @@ const ProductEdit = () => {
                   </span>
                 </label>
               </div>
-              <p className="text-xs text-amber-600 font-medium">
-                * Our AI will automatically crop and optimize images for the best viewing experience.
+              <p className="text-xs text-gray-400 font-medium italic">
+                * Images are automatically optimized for the best viewing experience.
               </p>
             </div>
           </div>

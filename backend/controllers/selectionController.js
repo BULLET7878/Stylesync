@@ -1,12 +1,12 @@
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 
-// @desc    Get AI Product Recommendations
-// @route   GET /api/ai/recommendations
+// @desc    Get Curated Product Recommendations
+// @route   GET /api/featured/curated
 // @access  Private
-const getRecommendations = async (req, res) => {
+const getCuratedRecommendations = async (req, res) => {
   try {
-    // Basic AI logic: Find categories the user has ordered
+    // Intelligent logic: Find categories the user has ordered
     const orders = await Order.find({ user: req.user._id }).populate('orderItems.product');
     let userCategories = new Set();
     
@@ -34,10 +34,10 @@ const getRecommendations = async (req, res) => {
   }
 };
 
-// @desc    Get AI Outfit Suggestions for a Product
-// @route   GET /api/ai/outfit/:productId
+// @desc    Get Style Pairing Suggestions for a Product
+// @route   GET /api/featured/pairings/:productId
 // @access  Public
-const getOutfitSuggestions = async (req, res) => {
+const getStylePairings = async (req, res) => {
   try {
     const product = await Product.findById(req.params.productId);
     
@@ -47,21 +47,22 @@ const getOutfitSuggestions = async (req, res) => {
 
     const { category, tags } = product;
 
-    // AI Logic for outfits: Find products in DIFFERENT categories but with matching tags
+    // Pairing logic: Find products in complementary categories
     let complementaryCategories = [];
-    if (category === 'shirts' || category === 'tshirts') {
-      complementaryCategories = ['trousers', 'jeans', 'shorts', 'shoes'];
-    } else if (category === 'trousers' || category === 'jeans' || category === 'shorts') {
-      complementaryCategories = ['shirts', 'tshirts', 'shoes'];
-    } else if (category === 'shoes') {
-      complementaryCategories = ['trousers', 'jeans', 'shirts'];
+    const lowerCat = category.toLowerCase();
+    if (lowerCat === 'shirts' || lowerCat === 'tshirts') {
+      complementaryCategories = ['Trousers', 'Jeans', 'Shorts', 'Shoes'];
+    } else if (lowerCat === 'trousers' || lowerCat === 'jeans' || lowerCat === 'shorts') {
+      complementaryCategories = ['Shirts', 'T-Shirts', 'Shoes'];
+    } else if (lowerCat === 'shoes') {
+      complementaryCategories = ['Trousers', 'Jeans', 'Shirts'];
     } else {
-      complementaryCategories = ['accessories'];
+      complementaryCategories = ['Accessories'];
     }
 
     const suggestions = await Product.find({
       category: { $in: complementaryCategories },
-      tags: { $in: tags && tags.length > 0 ? tags : ['casual', 'summer', 'formal'] } // match at least one tag, fallback
+      tags: { $in: tags && tags.length > 0 ? tags : ['casual', 'summer', 'formal'] } 
     }).limit(4);
 
     res.json(suggestions);
@@ -70,4 +71,4 @@ const getOutfitSuggestions = async (req, res) => {
   }
 };
 
-module.exports = { getRecommendations, getOutfitSuggestions };
+module.exports = { getCuratedRecommendations, getStylePairings };

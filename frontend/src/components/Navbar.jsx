@@ -226,19 +226,13 @@ const Navbar = () => {
         <div className="hidden md:block border-t border-gray-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-1 h-10 overflow-x-auto scrollbar-hide">
-              <Link
-                to="/shop"
-                className="flex-shrink-0 px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all uppercase tracking-wider"
-              >
-                All
-              </Link>
-              {NAV_CATEGORIES.map((cat) => (
+              {['All', 'Men', 'Women', 'Kids', 'Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
                 <Link
-                  key={cat.value}
-                  to={`/shop?category=${encodeURIComponent(cat.value)}`}
-                  className="flex-shrink-0 px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all uppercase tracking-wider"
+                  key={cat}
+                  to={cat === 'All' ? '/shop' : (['Men', 'Women', 'Kids'].includes(cat) ? `/shop?section=${cat}` : `/shop?category=${cat}`)}
+                  className="whitespace-nowrap px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-widest"
                 >
-                  {cat.label}
+                  {cat}
                 </Link>
               ))}
               {user?.email === 'rahuldhakarmm@gmail.com' && (
@@ -278,15 +272,19 @@ const Navbar = () => {
                 </form>
 
                 {/* Mobile Categories */}
-                <div className="flex flex-wrap gap-2">
-                  {NAV_CATEGORIES.map((cat) => (
-                    <Link
-                      key={cat.value}
-                      to={`/shop?category=${encodeURIComponent(cat.value)}`}
-                      className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg hover:bg-primary-100 hover:text-primary-700 transition-colors"
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {['Men', 'Women', 'Kids', 'Shirts', 'Shoes', 'Jeans', 'Ethnic'].map((cat) => (
+                    <button 
+                      key={cat} 
+                      onClick={() => {
+                        const path = ['Men', 'Women', 'Kids'].includes(cat) ? `/shop?section=${cat}` : `/shop?category=${cat}`;
+                        navigate(path);
+                        setIsOpen(false);
+                      }}
+                      className="bg-gray-50 text-gray-600 text-[10px] font-bold px-3 py-1.5 rounded-lg border border-gray-100 uppercase tracking-wider"
                     >
-                      {cat.label}
-                    </Link>
+                      {cat}
+                    </button>
                   ))}
                 </div>
 

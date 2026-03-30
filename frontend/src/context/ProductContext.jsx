@@ -5,16 +5,17 @@ export const ProductContext = createContext({});
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
-  const [aiRecommendations, setAiRecommendations] = useState([]);
+  const [curatedProducts, setCuratedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-  const searchProducts = async (keyword = '', category = '', sort = '', minPrice = '', maxPrice = '', rating = '') => {
+  const searchProducts = async (keyword = '', category = '', sort = '', minPrice = '', maxPrice = '', rating = '', section = '') => {
     setLoading(true);
     try {
       let query = `?keyword=${keyword}`;
       if (category) query += `&category=${category}`;
+      if (section) query += `&section=${section}`;
       if (sort) query += `&sort=${sort}`;
       if (minPrice !== '' && minPrice !== null) query += `&minPrice=${minPrice}`;
       if (maxPrice !== '' && maxPrice !== null) query += `&maxPrice=${maxPrice}`;
@@ -27,15 +28,15 @@ export const ProductProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const fetchRecommendations = async (token) => {
+  const fetchCuratedList = async (token) => {
     try {
       if (token) {
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get(`${API_URL}/api/ai/recommendations`, config);
-        setAiRecommendations(data);
+        const { data } = await axios.get(`${API_URL}/api/featured/curated`, config);
+        setCuratedProducts(data);
       } else {
         const { data } = await axios.get(`${API_URL}/api/products`);
-        setAiRecommendations(data.slice(0, 8));
+        setCuratedProducts(data.slice(0, 8));
       }
     } catch (error) {
        console.error(error);
@@ -47,7 +48,7 @@ export const ProductProvider = ({ children }) => {
   }, []);
 
   return (
-    <ProductContext.Provider value={{ products, loading, searchProducts, aiRecommendations, fetchRecommendations }}>
+    <ProductContext.Provider value={{ products, loading, searchProducts, curatedProducts, fetchCuratedList }}>
       {children}
     </ProductContext.Provider>
   );

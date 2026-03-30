@@ -38,6 +38,11 @@ const productSchema = new mongoose.Schema({
     type: String, // e.g., 'shoes', 'shirts', 'trousers', 'accessories'
     required: true,
   },
+  section: {
+    type: String,
+    enum: ['Men', 'Women', 'Kids', 'Unisex'],
+    default: 'Unisex',
+  },
   images: [String],
   description: {
     type: String,

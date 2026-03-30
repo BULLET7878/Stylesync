@@ -114,6 +114,32 @@ const Home = () => {
         </div>
       </section>
 
+      {/* ── Section Grid (Men, Women, Kids) ── */}
+      <section className="-mt-12 relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {[
+            { name: 'Men', img: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?auto=format&fit=crop&q=80', color: 'from-blue-600/40' },
+            { name: 'Women', img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80', color: 'from-pink-600/40' },
+            { name: 'Kids', img: 'https://images.unsplash.com/photo-1519234110453-29ec39671d2c?auto=format&fit=crop&q=80', color: 'from-amber-500/40' },
+          ].map((sec) => (
+            <Link 
+              key={sec.name} 
+              to={`/shop?section=${sec.name}`}
+              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden group shadow-2xl transition-transform hover:-translate-y-2"
+            >
+              <img src={sec.img} alt={sec.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className={`absolute inset-0 bg-gradient-to-t ${sec.color} to-transparent opacity-60 group-hover:opacity-80 transition-opacity`} />
+              <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{sec.name}</h3>
+                <div className="flex items-center gap-2 text-white/90 text-sm font-bold bg-white/20 backdrop-blur-md w-fit px-4 py-2 rounded-xl group-hover:bg-white group-hover:text-gray-900 transition-all">
+                  Shop Section <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ── Trust Badges ── */}
       <section className="border-b border-gray-100 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -179,7 +205,7 @@ const Home = () => {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-amber-500" />
-                <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Editor's Pick</p>
+                <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Handpicked for You</p>
               </div>
               <h2 className="text-2xl font-black text-gray-900">Trending Right Now</h2>
             </div>

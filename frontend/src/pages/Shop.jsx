@@ -23,6 +23,7 @@ const Shop = () => {
   const minPriceParam = sp.get('minPrice') || '';
   const maxPriceParam = sp.get('maxPrice') || '';
   const ratingParam   = sp.get('rating') || '';
+  const sectionParam  = sp.get('section') || '';
 
   const [keyword, setKeyword]         = useState(keywordParam);
   const [selectedCat, setSelectedCat] = useState(categoryParam || 'All');
@@ -30,24 +31,26 @@ const Shop = () => {
   const [minPrice, setMinPrice]       = useState(minPriceParam);
   const [maxPrice, setMaxPrice]       = useState(maxPriceParam);
   const [minRating, setMinRating]     = useState(ratingParam);
+  const [selectedSection, setSelectedSection] = useState(sectionParam || '');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode]       = useState('grid');
 
   useEffect(() => {
-    searchProducts(keywordParam, categoryParam === 'All' ? '' : categoryParam, sortParam, minPriceParam, maxPriceParam, ratingParam);
+    searchProducts(keywordParam, categoryParam === 'All' ? '' : categoryParam, sortParam, minPriceParam, maxPriceParam, ratingParam, sectionParam);
     setKeyword(keywordParam);
     setSelectedCat(categoryParam || 'All');
+    setSelectedSection(sectionParam || '');
     setSort(sortParam);
     setMinPrice(minPriceParam);
     setMaxPrice(maxPriceParam);
     setMinRating(ratingParam);
-    // eslint-disable-next-line
-  }, [keywordParam, categoryParam, sortParam, minPriceParam, maxPriceParam, ratingParam]);
+  }, [keywordParam, categoryParam, sortParam, minPriceParam, maxPriceParam, ratingParam, sectionParam]);
 
-  const updateUrl = (kw, cat, s, min, max, rat) => {
+  const updateUrl = (kw, cat, s, min, max, rat, sec) => {
     const params = new URLSearchParams();
     if (kw)  params.set('search', kw);
     if (cat && cat !== 'All') params.set('category', cat);
+    if (sec) params.set('section', sec);
     if (s)   params.set('sort', s);
     if (min) params.set('minPrice', min);
     if (max) params.set('maxPrice', max);
@@ -55,12 +58,13 @@ const Shop = () => {
     navigate(`/shop?${params.toString()}`);
   };
 
-  const handleSearch = (e) => { e.preventDefault(); updateUrl(keyword, selectedCat, sort, minPrice, maxPrice, minRating); };
-  const handleCat    = (c) => { setSelectedCat(c); updateUrl(keyword, c, sort, minPrice, maxPrice, minRating); };
-  const handleSort   = (v) => { setSort(v); updateUrl(keyword, selectedCat, v, minPrice, maxPrice, minRating); };
-  const handleReset  = () => { setKeyword(''); setSelectedCat('All'); setSort(''); setMinPrice(''); setMaxPrice(''); setMinRating(''); navigate('/shop'); };
+  const handleSearch = (e) => { e.preventDefault(); updateUrl(keyword, selectedCat, sort, minPrice, maxPrice, minRating, selectedSection); };
+  const handleCat    = (c) => { setSelectedCat(c); updateUrl(keyword, c, sort, minPrice, maxPrice, minRating, selectedSection); };
+  const handleSection = (sec) => { setSelectedSection(sec); updateUrl(keyword, selectedCat, sort, minPrice, maxPrice, minRating, sec); };
+  const handleSort   = (v) => { setSort(v); updateUrl(keyword, selectedCat, v, minPrice, maxPrice, minRating, selectedSection); };
+  const handleReset  = () => { setKeyword(''); setSelectedCat('All'); setSelectedSection(''); setSort(''); setMinPrice(''); setMaxPrice(''); setMinRating(''); navigate('/shop'); };
 
-  const activeFiltersCount = [selectedCat !== 'All' && selectedCat, minPrice, maxPrice, minRating, sort].filter(Boolean).length;
+  const activeFiltersCount = [selectedCat !== 'All' && selectedCat, selectedSection, minPrice, maxPrice, minRating, sort].filter(Boolean).length;
 
   const FilterPanel = () => (
     <div className="space-y-6">
@@ -72,6 +76,16 @@ const Shop = () => {
           className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-400 text-sm bg-gray-50 focus:bg-white transition-all"
         />
       </form>
+      <div>
+        <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Section</p>
+        <div className="flex flex-wrap gap-2">
+          {['Men', 'Women', 'Kids'].map((sec) => (
+            <button key={sec} onClick={() => handleSection(selectedSection === sec ? '' : sec)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSection === sec ? 'bg-primary-600 text-white border-primary-600' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+            >{sec}</button>
+          ))}
+        </div>
+      </div>
 
       <div>
         <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Category</p>
@@ -188,6 +202,11 @@ const Shop = () => {
             {/* Active Filter Tags */}
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
+                {selectedSection && (
+                  <span className="flex items-center gap-1.5 bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">
+                    Section: {selectedSection} <button onClick={() => handleSection('')}><X className="w-3 h-3" /></button>
+                  </span>
+                )}
                 {selectedCat !== 'All' && selectedCat && (
                   <span className="flex items-center gap-1.5 bg-primary-100 text-primary-700 text-xs font-bold px-3 py-1 rounded-full">
                     {selectedCat} <button onClick={() => handleCat('All')}><X className="w-3 h-3" /></button>

@@ -17,6 +17,10 @@ const getProducts = async (req, res) => {
     const category = req.query.category 
       ? { category: { $regex: new RegExp(`^${req.query.category}$`, 'i') } } 
       : {};
+
+    const section = req.query.section 
+      ? { section: { $regex: new RegExp(`^${req.query.section}$`, 'i') } } 
+      : {};
     
     const priceFilter = {};
     if (req.query.minPrice && req.query.minPrice.trim() !== '') {
@@ -43,7 +47,7 @@ const getProducts = async (req, res) => {
     else if (req.query.sort === 'price_desc') sortBy = { price: -1 };
     else if (req.query.sort === 'popularity') sortBy = { rating: -1, numReviews: -1 };
 
-    const products = await Product.find({ ...keyword, ...category, ...finalPriceFilter, ...ratingFilter })
+    const products = await Product.find({ ...keyword, ...category, ...section, ...finalPriceFilter, ...ratingFilter })
       .populate('user', 'name')
       .sort(sortBy);
       
@@ -129,6 +133,7 @@ const createProduct = async (req, res) => {
       description,
       images,
       category,
+      section,
       countInStock,
       tags
     } = req.body;
@@ -140,6 +145,7 @@ const createProduct = async (req, res) => {
       user: req.user._id,
       images: images || ['/images/sample.jpg'],
       category,
+      section: section || 'Unisex',
       countInStock,
       numReviews: 0,
       description,
@@ -165,6 +171,7 @@ const updateProduct = async (req, res) => {
       description,
       images,
       category,
+      section,
       countInStock,
       tags
     } = req.body;
@@ -184,6 +191,7 @@ const updateProduct = async (req, res) => {
       product.description = description || product.description;
       product.images = images || product.images;
       product.category = category || product.category;
+      product.section = section || product.section;
       product.countInStock = countInStock || product.countInStock;
       product.tags = tags || product.tags;
 

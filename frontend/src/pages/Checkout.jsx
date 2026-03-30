@@ -74,13 +74,13 @@ const Checkout = () => {
     }
     
     // Pre-fill address if available in user profile
-    if (user && user.shippingAddress) {
+    if (user && user.shippingAddress && !address && !houseNumber && !postalCode) {
       setAddress(user.shippingAddress.address || '');
       setHouseNumber(user.shippingAddress.houseNumber || '');
       setCity(user.shippingAddress.city || '');
       setState(user.shippingAddress.state || '');
       setPostalCode(user.shippingAddress.postalCode || '');
-      setCountry(user.shippingAddress.country || '');
+      setCountry(user.shippingAddress.country || 'India');
       setPhone(user.phone || '');
     }
   }, [user, navigate, cartItems, paymentStatus]);
