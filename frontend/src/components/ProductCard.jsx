@@ -25,7 +25,7 @@ const ProductCard = ({ product }) => {
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
   const isNew = product.createdAt && (Date.now() - new Date(product.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
-  const imgSrc = product.images?.[0]
+  const imgSrc = product.images?.length > 0 && product.images[0]
     ? (product.images[0].startsWith('http') 
         ? product.images[0] 
         : `${API.replace(/\/$/, '')}/${product.images[0].replace(/^\//, '')}`)

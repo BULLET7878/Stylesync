@@ -292,7 +292,9 @@ const ListProductCard = ({ product }) => {
   const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
   const API = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  const imgSrc = product.images?.[0]?.startsWith('http') ? product.images[0] : `${API}${product.images?.[0]}`;
+  const imgSrc = product.images?.[0]?.startsWith('http') 
+    ? product.images[0] 
+    : `${API.replace(/\/$/, '')}/${product.images?.[0]?.replace(/^\//, '')}`;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 hover:shadow-md transition-shadow">

@@ -98,7 +98,7 @@ const Home = () => {
                 className={`relative overflow-hidden rounded-2xl aspect-square bg-gray-800 group ${i === 0 ? 'col-span-2 aspect-video' : ''}`}
               >
                 <img
-                  src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${p.images?.[0]}`}
+                  src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5001'}/${p.images?.[0]?.replace(/^\//, '')}`}
                   alt={p.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                   onError={(e) => { e.target.src = '/assets/fallback.png'; }}
