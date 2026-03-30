@@ -45,6 +45,21 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Buyers */}
+          <div>
+            <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyers</h4>
+            <ul className="space-y-2.5 text-sm">
+              {[
+                { label: "My Dashboard", to: "/dashboard" },
+                { label: "Orders", to: "/dashboard" },
+                { label: "Wishlist", to: "/wishlist" },
+                { label: "Cart", to: "/cart" },
+              ].map(l => (
+                <li key={l.label}><Link to={l.to} className="hover:text-white transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
           {/* Sellers - Only visible to owner */}
           {user?.email === 'rahuldhakarmm@gmail.com' && (
             <div>
