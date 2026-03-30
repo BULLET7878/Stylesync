@@ -98,12 +98,9 @@ const Login = () => {
           />
         </div>
         
-        <p className="text-center mt-6 text-gray-600 flex items-center justify-center gap-4 divide-x divide-gray-300">
-          <Link to={`/register?redirect=${redirect}`} className="text-primary-600 font-medium hover:text-primary-700 transition-colors pr-4">
-            Create account
-          </Link>
-          <Link to={`/register?role=seller&redirect=${redirect}`} className="text-green-600 font-medium hover:text-green-700 transition-colors pl-4">
-            Become a seller
+        <p className="text-center mt-6 text-gray-600">
+          <Link to={`/register?redirect=${redirect}`} className="text-primary-600 font-medium hover:text-primary-700 transition-colors">
+            Create an account
           </Link>
         </p>
       </div>

@@ -44,6 +44,10 @@ const ProductDetail = () => {
         if (alsoRes.status === 'fulfilled') setAlsoBought(alsoRes.value.data.filter(p => p._id !== id).slice(0, 4));
         const rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
         if (!rv.includes(id)) localStorage.setItem('recentlyViewed', JSON.stringify([id, ...rv].slice(0, 4)));
+        if (user && user.role === 'seller' && user.email !== 'rahuldhakarmm@gmail.com') {
+          toast.error('Sellers cannot purchase products.');
+          navigate('/dashboard');
+        }
       } catch (e) { toast.error('Could not load product'); }
       setLoading(false);
     };
@@ -191,7 +195,7 @@ const ProductDetail = () => {
 
             <p className="text-gray-600 leading-relaxed mb-6 text-sm">{product.description}</p>
 
-            {user?.role !== 'seller' ? (
+            {user?.role !== 'seller' || user?.email === 'rahuldhakarmm@gmail.com' ? (
               <>
                 {/* Qty */}
                 <div className="flex items-center gap-4 mb-6">

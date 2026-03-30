@@ -77,7 +77,7 @@ const Info = () => {
         <div className="space-y-6 text-gray-600">
           <p className="text-lg">Need help with an order? Our support team is available 24/7.</p>
           <div className="space-y-4">
-            {['How do I track my order?', 'Can I change my shipping address?', 'What is the refund process?', 'How to become a verified seller?'].map(q => (
+            {['How do I track my order?', 'Can I change my shipping address?', 'What is the refund process?'].map(q => (
               <details key={q} className="group bg-gray-50 rounded-2xl">
                 <summary className="p-5 font-bold text-gray-900 cursor-pointer list-none flex justify-between items-center">
                   {q}

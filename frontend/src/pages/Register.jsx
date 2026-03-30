@@ -14,9 +14,8 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const initialRole = searchParams.get('role') || 'buyer';
   const redirect = searchParams.get('redirect') || '/';
-  const [role, setRole] = useState(initialRole);
+  const role = 'buyer'; // Force all new registrations to be buyers
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -53,19 +52,6 @@ const Register = () => {
         </div>
 
         <form onSubmit={submitHandler} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
-            <div className="flex gap-4">
-              <label className={`flex-1 flex justify-center py-2 px-4 border rounded-xl cursor-pointer transition-colors ${role === 'buyer' ? 'border-primary-600 bg-primary-50 text-primary-700 font-medium' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                <input type="radio" value="buyer" checked={role === 'buyer'} onChange={() => setRole('buyer')} className="hidden" />
-                Buyer
-              </label>
-              <label className={`flex-1 flex justify-center py-2 px-4 border rounded-xl cursor-pointer transition-colors ${role === 'seller' ? 'border-primary-600 bg-primary-50 text-primary-700 font-medium' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                <input type="radio" value="seller" checked={role === 'seller'} onChange={() => setRole('seller')} className="hidden" />
-                Seller
-              </label>
-            </div>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -117,7 +103,7 @@ const Register = () => {
             disabled={isSubmitting}
             className="w-full bg-primary-600 text-white rounded-xl py-3 mt-4 font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Creating account...' : `Sign Up as ${role === 'buyer' ? 'Buyer' : 'Seller'}`}
+            {isSubmitting ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
@@ -130,8 +116,8 @@ const Register = () => {
         <div className="mt-6 flex justify-center">
           <GoogleLogin
             onSuccess={credentialResponse => {
-              googleLogin(credentialResponse.credential, role)
-                .then(() => toast.success(`Registration successful as ${role}!`))
+              googleLogin(credentialResponse.credential)
+                .then(() => toast.success('Registration successful!'))
                 .catch(err => toast.error('Google Registration failed'));
             }}
             onError={() => {
