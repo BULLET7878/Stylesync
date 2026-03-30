@@ -68,10 +68,19 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
 
-            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5 flex-shrink-0 group no-underline"
+              onClick={(e) => {
+                if (location.pathname === '/') {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            >
               <img src="/logo.png?v=5" alt="logo" className="h-10 w-auto object-contain" />
               <div className="flex items-center text-gray-900 font-black">
-                <span className="text-3xl leading-none tracking-tighter mr-1">S</span>
+                <span className="text-3xl leading-none tracking-tighter mr-1 uppercase">S</span>
                 <div className="flex flex-col text-[0.55rem] leading-[1.1] uppercase tracking-[0.25em] mt-1">
                   <span>mart</span>
                   <span>ync</span>
@@ -232,14 +241,16 @@ const Navbar = () => {
                   {cat.label}
                 </Link>
               ))}
-              <div className="ml-auto flex-shrink-0">
-                <Link
-                  to="/register?role=seller"
-                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all border border-amber-200"
-                >
-                  <Store className="w-3 h-3" /> Start Selling
-                </Link>
-              </div>
+              {user?.email === 'rahuldhakarmm@gmail.com' && (
+                <div className="ml-auto flex-shrink-0">
+                  <Link
+                    to="/seller/dashboard"
+                    className="flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all border border-amber-200"
+                  >
+                    <Store className="w-3 h-3" /> Seller Panel
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

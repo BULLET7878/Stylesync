@@ -26,7 +26,9 @@ const ProductCard = ({ product }) => {
   const isNew = product.createdAt && (Date.now() - new Date(product.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
   const imgSrc = product.images?.[0]
-    ? (product.images[0].startsWith('http') ? product.images[0] : `${API}${product.images[0]}`)
+    ? (product.images[0].startsWith('http') 
+        ? product.images[0] 
+        : `${API.replace(/\/$/, '')}/${product.images[0].replace(/^\//, '')}`)
     : FALLBACK;
 
   const handleAddToCart = (e) => {
@@ -54,6 +56,7 @@ const ProductCard = ({ product }) => {
         <img
           src={imgSrc}
           alt={product.title}
+          loading="lazy"
           onError={(e) => { e.target.src = FALLBACK; }}
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isOutOfStock ? 'opacity-60 grayscale' : ''}`}
         />

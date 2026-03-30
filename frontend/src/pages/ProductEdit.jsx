@@ -76,8 +76,10 @@ const ProductEdit = () => {
       };
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
       const { data } = await axios.post(`${API_URL}/api/upload`, formData, config);
-      setImages([...images, data]);
-      toast.success('Image uploaded and processed successfully');
+      // API now returns { imageUrl: '/api/upload/image/<id>' }
+      const imageUrl = data.imageUrl || data;
+      setImages([...images, imageUrl]);
+      toast.success('Image uploaded successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Upload failed');
     } finally {
@@ -255,18 +257,22 @@ const ProductEdit = () => {
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-2">Product Images</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-                {images.map((img, idx) => (
-                  <div key={idx} className="relative aspect-[4/5] rounded-xl overflow-hidden border border-gray-100 group">
-                    <img src={img && img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${img}`} alt="" className="w-full h-full object-cover" />
-                    <button 
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                {images.map((img, idx) => {
+                  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+                  const src = img?.startsWith('http') ? img : `${API_URL}${img}`;
+                  return (
+                    <div key={idx} className="relative aspect-[4/5] rounded-xl overflow-hidden border border-gray-100 group">
+                      <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
                 
                 <label className={`aspect-[4/5] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all ${uploading ? 'animate-pulse' : ''}`}>
                   <input type="file" className="hidden" onChange={uploadFileHandler} disabled={uploading} />

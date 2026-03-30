@@ -112,6 +112,9 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payment', paymentRoutes);
 
+const couponRoutes = require('./routes/couponRoutes');
+app.use('/api/coupons', couponRoutes);
+
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 

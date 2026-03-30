@@ -98,7 +98,9 @@ const ProductDetail = () => {
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.discountPrice / product.price) * 100) : 0;
   const images = product.images?.length > 0 ? product.images : [FALLBACK];
-  const imgSrc = (src) => src?.startsWith('http') ? src : `${API}${src}`;
+  const imgSrc = (src) => src?.startsWith('http') 
+    ? src 
+    : `${API.replace(/\/$/, '')}/${src?.replace(/^\//, '')}`;
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -121,6 +123,7 @@ const ProductDetail = () => {
               <img
                 src={imgSrc(images[activeImg])}
                 alt={product.title}
+                loading="eager"
                 onError={(e) => { e.target.src = FALLBACK; }}
                 className="w-full h-full object-cover"
               />
@@ -130,7 +133,7 @@ const ProductDetail = () => {
                 {images.map((img, i) => (
                   <button key={i} onClick={() => setActiveImg(i)}
                     className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-primary-600' : 'border-transparent'}`}>
-                    <img src={imgSrc(img)} alt="" onError={(e) => { e.target.src = FALLBACK; }} className="w-full h-full object-cover" />
+                    <img src={imgSrc(img)} alt="" loading="lazy" onError={(e) => { e.target.src = FALLBACK; }} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -314,25 +317,33 @@ const ProductDetail = () => {
 
               {/* Write Review */}
               {user && user.role === 'buyer' ? (
-                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                  <h3 className="font-bold text-gray-900 mb-4 text-sm">Write a Review</h3>
-                  <form onSubmit={submitReview} className="space-y-3">
-                    <div className="flex gap-1">
-                      {[1,2,3,4,5].map(s => (
-                        <button key={s} type="button" onClick={() => setRating(s)}>
-                          <Star className={`w-7 h-7 transition-colors ${s <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 hover:text-yellow-300'}`} />
-                        </button>
-                      ))}
-                    </div>
-                    <textarea rows="3" value={comment} onChange={(e) => setComment(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-400 outline-none text-sm resize-none"
-                      placeholder="Share your experience..." />
-                    <button type="submit" disabled={submittingReview}
-                      className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all disabled:opacity-50">
-                      {submittingReview ? 'Posting...' : 'Post Review'}
-                    </button>
-                  </form>
-                </div>
+                product.canReview ? (
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                    <h3 className="font-bold text-gray-900 mb-4 text-sm">Write a Review</h3>
+                    <form onSubmit={submitReview} className="space-y-3">
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(s => (
+                          <button key={s} type="button" onClick={() => setRating(s)}>
+                            <Star className={`w-7 h-7 transition-colors ${s <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 hover:text-yellow-300'}`} />
+                          </button>
+                        ))}
+                      </div>
+                      <textarea rows="3" value={comment} onChange={(e) => setComment(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-400 outline-none text-sm resize-none"
+                        placeholder="Share your experience..." />
+                      <button type="submit" disabled={submittingReview}
+                        className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all disabled:opacity-50">
+                        {submittingReview ? 'Posting...' : 'Post Review'}
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 rounded-2xl p-5 border border-amber-200 text-center">
+                    <AlertCircle className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                    <p className="text-sm font-bold text-amber-800">Verified Purchase Required</p>
+                    <p className="text-xs text-amber-600 mt-1">You can only review products that have been delivered to you.</p>
+                  </div>
+                )
               ) : !user ? (
                 <div className="text-center p-5 border border-dashed border-gray-200 rounded-2xl">
                   <p className="text-sm text-gray-500 mb-3">Sign in to write a review</p>

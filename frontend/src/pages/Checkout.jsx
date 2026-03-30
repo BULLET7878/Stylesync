@@ -14,14 +14,52 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState('');
+  const [houseNumber, setHouseNumber] = useState('');
   const [city, setCity] = useState('');
+  const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
+  const [phone, setPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI_DIRECT'); 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isZipLoading, setIsZipLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, verification, success
   const [orderDetails, setOrderDetails] = useState(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [isCouponLoading, setIsCouponLoading] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const { updateProfile } = useContext(AuthContext);
+
+  const fetchLocationData = async (zip) => {
+    if (zip.length === 6) {
+      setIsZipLoading(true);
+      try {
+        const { data } = await axios.get(`https://api.zippopotam.us/IN/${zip}`);
+        if (data.places && data.places.length > 0) {
+          const place = data.places[0];
+          setCity(place['place name']);
+          setState(place['state']);
+          setCountry(data['country']);
+          toast.success(`Located: ${place['place name']}, ${place['state']}`);
+        }
+      } catch (error) {
+        console.error('Zip code lookup failed', error);
+      } finally {
+        setIsZipLoading(false);
+      }
+    }
+  };
+
+  const handleZipChange = (e) => {
+    const zip = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setPostalCode(zip);
+    if (zip.length === 6) {
+      fetchLocationData(zip);
+    }
+  };
 
   useEffect(() => {
     if (user && user.role === 'seller') {
@@ -31,16 +69,57 @@ const Checkout = () => {
     if (cartItems.length === 0 && paymentStatus === 'idle') {
       navigate('/cart');
     }
+    
+    // Pre-fill address if available in user profile
+    if (user && user.shippingAddress) {
+      setAddress(user.shippingAddress.address || '');
+      setHouseNumber(user.shippingAddress.houseNumber || '');
+      setCity(user.shippingAddress.city || '');
+      setState(user.shippingAddress.state || '');
+      setPostalCode(user.shippingAddress.postalCode || '');
+      setCountry(user.shippingAddress.country || '');
+      setPhone(user.phone || '');
+    }
   }, [user, navigate, cartItems, paymentStatus]);
 
   const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
   const shippingPrice = itemsPrice >= 999 ? 0 : 99;
-  const totalPrice = itemsPrice + taxPrice + shippingPrice;
+  const totalPrice = itemsPrice + taxPrice + shippingPrice - discountAmount;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+    setIsCouponLoading(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const { data } = await axios.post(`${API_URL}/api/coupons/validate`, { code: couponCode }, config);
+      
+      let discount = 0;
+      if (data.discountType === 'percentage') {
+        discount = (data.discountAmount / 100) * itemsPrice;
+      } else {
+        discount = data.discountAmount;
+      }
+      
+      setDiscountAmount(discount);
+      setCouponApplied(true);
+      toast.success(`Coupon applied! You saved ₹${discount.toFixed(2)}`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Invalid coupon code');
+      setDiscountAmount(0);
+      setCouponApplied(false);
+    } finally {
+      setIsCouponLoading(false);
+    }
+  };
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
-    if (!address || !city || !postalCode || !country) {
+    if (!address || !houseNumber || !city || !state || !postalCode || !country) {
       toast.error('Please fill in all shipping details');
       return;
     }
@@ -65,10 +144,27 @@ const Checkout = () => {
       // 1. Create Order
       const { data: order } = await axios.post(`${API_URL}/api/orders`, {
         orderItems: cartItems,
-        shippingAddress: { address, city, postalCode, country },
+        shippingAddress: { address, houseNumber, city, state, postalCode, country, phone },
         paymentMethod: 'UPI',
-        itemsPrice, taxPrice, shippingPrice, totalPrice,
+        itemsPrice, 
+        taxPrice, 
+        shippingPrice, 
+        totalPrice,
+        discount: discountAmount,
+        couponCode: couponApplied ? couponCode : '',
       }, config);
+
+      // 1.5 Update User Profile if "Save Address" is checked
+      if (saveAddress) {
+        try {
+          await updateProfile({
+            phone,
+            shippingAddress: { address, houseNumber, city, state, postalCode, country }
+          });
+        } catch (profileError) {
+          console.error('Failed to save profile address', profileError);
+        }
+      }
 
       setOrderDetails(order);
 
@@ -102,23 +198,73 @@ const Checkout = () => {
               Shipping Destination
             </h2>
             <div className="space-y-6 mb-12">
-              <div className="relative group">
-                <input type="text" required value={address} onChange={(e) => setAddress(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="Street Address" />
-                <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Address</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 relative group">
+                  <input type="text" required value={address} onChange={(e) => setAddress(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="Street Name / Colony" />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Street Address</label>
+                </div>
+                <div className="relative group">
+                  <input type="text" required value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="No. 123 / A-1" />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">House/Flat No.</label>
+                </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    required 
+                    value={postalCode} 
+                    onChange={handleZipChange}
+                    className={`w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white ${isZipLoading ? 'pr-12' : ''}`} 
+                    placeholder="Zip Code" 
+                  />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Zip Code</label>
+                  {isZipLoading && (
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                      <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
+                    </div>
+                  )}
+                </div>
                 <div className="relative group">
                   <input type="text" required value={city} onChange={(e) => setCity(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="City" />
                   <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">City</label>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative group">
-                  <input type="text" required value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="Postal Code" />
-                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Zip Code</label>
+                  <input type="text" required value={state} onChange={(e) => setState(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="State/Union Territory" />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">State</label>
+                </div>
+                <div className="relative group">
+                  <input type="text" required value={country} onChange={(e) => setCountry(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="Country" />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Country</label>
                 </div>
               </div>
-              <div className="relative group">
-                <input type="text" required value={country} onChange={(e) => setCountry(e.target.value)} className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" placeholder="Country" />
-                <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Country</label>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative group">
+                  <input 
+                    type="tel" 
+                    required 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                    className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-black rounded-2xl outline-none transition-all font-bold group-focus-within:bg-white" 
+                    placeholder="Mobile Number" 
+                  />
+                  <label className="absolute left-6 -top-2.5 px-2 bg-white text-[10px] font-black text-gray-400 uppercase tracking-widest transition-all group-focus-within:text-black">Mobile Number</label>
+                </div>
+                <div className="flex items-center gap-3 px-2">
+                  <input 
+                    type="checkbox" 
+                    id="save-address"
+                    checked={saveAddress}
+                    onChange={(e) => setSaveAddress(e.target.checked)}
+                    className="w-5 h-5 rounded-md border-gray-300 text-primary-600 focus:ring-primary-600 cursor-pointer"
+                  />
+                  <label htmlFor="save-address" className="text-sm font-bold text-gray-600 cursor-pointer">Save this address for future use</label>
+                </div>
               </div>
             </div>
 
@@ -200,6 +346,34 @@ const Checkout = () => {
               <div className="flex justify-between items-center text-gray-500 font-bold">
                 <span>Tax (GST)</span>
                 <span className="text-gray-900">₹{taxPrice.toFixed(2)}</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between items-center text-green-600 font-black">
+                  <span>Discount ({couponCode})</span>
+                  <span>-₹{discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Coupon Input */}
+            <div className="mb-8">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Coupon Code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  disabled={couponApplied}
+                  className="flex-1 px-4 py-2 border-2 border-gray-100 rounded-xl outline-none focus:border-black font-bold text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={couponApplied ? () => { setCouponApplied(false); setDiscountAmount(0); setCouponCode(''); } : handleApplyCoupon}
+                  disabled={isCouponLoading}
+                  className={`px-4 py-2 rounded-xl font-black text-xs transition-all ${couponApplied ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-gray-100 text-gray-900 hover:bg-black hover:text-white'}`}
+                >
+                  {isCouponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : couponApplied ? 'REMOVE' : 'APPLY'}
+                </button>
               </div>
             </div>
             

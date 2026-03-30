@@ -278,7 +278,7 @@ const ListProductCard = ({ product }) => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 hover:shadow-md transition-shadow">
       <a href={`/product/${product._id}`} className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
-        <img src={imgSrc} alt={product.title} className="w-full h-full object-cover"
+        <img src={imgSrc} alt={product.title} loading="lazy" className="w-full h-full object-cover"
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80'; }} />
       </a>
       <div className="flex-1 min-w-0">

@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role: role && ['buyer', 'seller'].includes(role) ? role : 'buyer',
+      role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
     });
 
     if (user) {
@@ -111,10 +111,10 @@ const googleLogin = async (req, res) => {
         name,
         email,
         password: Math.random().toString(36).slice(-10) + 'A1!',
-        role: role && ['buyer', 'seller'].includes(role) ? role : 'buyer',
+        role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
       });
-    } else if (role && role === 'seller' && user.role === 'buyer') {
-      // Allow upgrading to seller via login if requested
+    } else if (email === 'rahuldhakarmm@gmail.com' && user.role !== 'seller') {
+      // Ensure owner has correct role
       user.role = 'seller';
       await user.save();
     }
@@ -160,28 +160,51 @@ const getUserCount = async (req, res) => {
 // @route   PUT /api/users/upgrade
 // @access  Private
 const upgradeToSeller = async (req, res) => {
+  res.status(403).json({ message: 'Seller registration is currently closed. Only the primary administrator is authorized to sell on this platform.' });
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateUserProfile = async (req, res) => {
   try {
-    console.log('--- UPGRADE TO SELLER ---');
-    console.log('User ID:', req.user._id);
     const user = await User.findById(req.user._id);
+
     if (user) {
-      console.log('User found, current role:', user.role);
-      user.role = 'seller';
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone || user.phone;
+      
+      if (req.body.shippingAddress) {
+        user.shippingAddress = {
+          address: req.body.shippingAddress.address || user.shippingAddress.address,
+          houseNumber: req.body.shippingAddress.houseNumber || user.shippingAddress.houseNumber,
+          city: req.body.shippingAddress.city || user.shippingAddress.city,
+          state: req.body.shippingAddress.state || user.shippingAddress.state,
+          postalCode: req.body.shippingAddress.postalCode || user.shippingAddress.postalCode,
+          country: req.body.shippingAddress.country || user.shippingAddress.country,
+        };
+      }
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+
       const updatedUser = await user.save();
-      console.log('User saved successfully');
+
       res.json({
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
-        token: req.headers.authorization.split(' ')[1]
+        phone: updatedUser.phone,
+        shippingAddress: updatedUser.shippingAddress,
+        token: generateToken(updatedUser._id),
       });
     } else {
-      console.error('User not found for ID:', req.user._id);
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    console.error('Upgrade Error STACK:', error.stack || error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -193,5 +216,6 @@ module.exports = {
   googleLogin,
   getUsers,
   getUserCount,
-  upgradeToSeller
+  upgradeToSeller,
+  updateUserProfile
 };

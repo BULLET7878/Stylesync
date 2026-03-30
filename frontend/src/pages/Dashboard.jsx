@@ -106,7 +106,7 @@ const Dashboard = () => {
               <Link to="/shop" className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
                 <span>Browse Shop</span><ChevronRight className="w-4 h-4 text-gray-400" />
               </Link>
-              {user.role === 'seller' && (
+              {user.email === 'rahuldhakarmm@gmail.com' && (
                 <Link to="/seller/dashboard" className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors text-sm font-bold text-amber-700">
                   <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Seller Panel</span>
                   <ChevronRight className="w-4 h-4" />
@@ -114,28 +114,12 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Become Seller */}
-            {user.role === 'buyer' && (
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 text-center">
-                <Store className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <p className="text-sm font-bold text-gray-900 mb-1">Start Selling</p>
-                <p className="text-xs text-gray-500 mb-3">List your products and reach thousands of buyers</p>
-                <button
-                  onClick={handleUpgrade}
-                  disabled={upgrading}
-                  className="w-full bg-amber-500 text-white py-2 rounded-xl text-xs font-black hover:bg-amber-600 transition-all disabled:opacity-50"
-                >
-                  {upgrading ? 'Upgrading...' : 'Become a Seller'}
-                </button>
-              </div>
-            )}
-
             <button
-              onClick={logout}
-              className="w-full py-2.5 rounded-xl border border-red-200 text-red-500 text-sm font-bold hover:bg-red-50 transition-colors"
-            >
-              Sign Out
-            </button>
+               onClick={logout}
+               className="w-full py-2.5 rounded-xl border border-red-200 text-red-500 text-sm font-bold hover:bg-red-50 transition-colors"
+             >
+               Sign Out
+             </button>
           </div>
 
           {/* Orders */}

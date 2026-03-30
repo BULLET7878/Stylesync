@@ -85,7 +85,7 @@ const getProductById = async (req, res) => {
         try {
           const token = req.headers.authorization.split(' ')[1];
           const decoded = jwt.verify(token, process.env.JWT_SECRET);
-          currentUser = decoded.id;
+          currentUser = decoded.id || decoded._id;
         } catch (e) {
           // Ignore invalid tokens for public route
         }
@@ -93,6 +93,15 @@ const getProductById = async (req, res) => {
 
       if (currentUser) {
         productObj.isOwner = product.user._id.toString() === currentUser.toString() || (req.user && req.user.role === 'admin');
+        
+        // Check if user has purchased and received this product to allow reviews
+        const Order = require('../models/Order');
+        const hasDelivered = await Order.findOne({
+          user: currentUser,
+          status: 'Delivered',
+          'orderItems.product': req.params.id
+        });
+        productObj.canReview = !!hasDelivered;
       }
       
       res.json(productObj);
@@ -218,16 +227,29 @@ const deleteProduct = async (req, res) => {
 const createProductReview = async (req, res) => {
   try {
     const { rating, comment } = req.body;
+    const Order = require('../models/Order');
 
     const product = await Product.findById(req.params.id);
 
     if (product) {
+      // 1. Check if user already reviewed
       const alreadyReviewed = product.reviews.find(
         (r) => r.user.toString() === req.user._id.toString()
       );
 
       if (alreadyReviewed) {
         return res.status(400).json({ message: 'Product already reviewed' });
+      }
+
+      // 2. Check if user has purchased and received this product
+      const hasPurchased = await Order.findOne({
+        user: req.user._id,
+        status: 'Delivered',
+        'orderItems.product': req.params.id
+      });
+
+      if (!hasPurchased) {
+        return res.status(403).json({ message: 'You can only review products you have purchased and received.' });
       }
 
       const review = {
