@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 import { toast } from 'react-toastify';
@@ -49,7 +49,7 @@ export const WishlistProvider = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`${API_URL}/api/wishlist/${productId}`, {}, config);
+      await axios.post(`${API_URL}/api/wishlist/${productId}`, {}, config);
       fetchWishlist();
       toast.success('Added to wishlist');
     } catch (error) {

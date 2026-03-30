@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ShoppingCart, Star, Heart, Sparkles, AlertCircle, Minus, Plus, CheckCircle, Truck, RefreshCw, ShieldCheck, MapPin, Share2 } from 'lucide-react';
+import { ShoppingCart, Star, Heart, TrendingUp, AlertCircle, Minus, Plus, CheckCircle, Truck, RefreshCw, ShieldCheck, MapPin, Share2 } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
@@ -44,9 +44,9 @@ const ProductDetail = () => {
         if (alsoRes.status === 'fulfilled') setAlsoBought(alsoRes.value.data.filter(p => p._id !== id).slice(0, 4));
         const rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
         if (!rv.includes(id)) localStorage.setItem('recentlyViewed', JSON.stringify([id, ...rv].slice(0, 4)));
-        if (user && user.role === 'seller' && user.email !== 'rahuldhakarmm@gmail.com') {
+        if (user && user.role === 'seller') {
           toast.error('Sellers cannot purchase products.');
-          navigate('/dashboard');
+          navigate('/seller/dashboard');
         }
       } catch (e) { toast.error('Could not load product'); }
       setLoading(false);

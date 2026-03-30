@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, Heart, AlertCircle } from 'lucide-react';
 import { CartContext } from '../context/CartContext';

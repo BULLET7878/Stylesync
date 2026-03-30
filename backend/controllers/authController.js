@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role: role === 'seller' ? 'seller' : 'buyer',
+      role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
     });
 
     if (user) {
@@ -115,8 +115,11 @@ const googleLogin = async (req, res) => {
         name,
         email,
         password: Math.random().toString(36).slice(-10) + 'A1!',
-        role: 'buyer',
+        role: email === 'rahuldhakarmm@gmail.com' ? 'seller' : 'buyer',
       });
+    } else if (email === 'rahuldhakarmm@gmail.com' && user.role !== 'seller') {
+      user.role = 'seller';
+      await user.save();
     }
 
     res.json({
@@ -162,24 +165,7 @@ const getUserCount = async (req, res) => {
 // @route   PUT /api/users/upgrade
 // @access  Private
 const upgradeToSeller = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.role === 'seller') return res.status(400).json({ message: 'Already a seller' });
-    user.role = 'seller';
-    const updatedUser = await user.save();
-    res.json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      phone: updatedUser.phone,
-      shippingAddress: updatedUser.shippingAddress,
-      token: generateToken(updatedUser._id),
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  res.status(403).json({ message: 'Seller registration is closed. Only the platform owner can sell.' });
 };
 
 // @desc    Update user profile

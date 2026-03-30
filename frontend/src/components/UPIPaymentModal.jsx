@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, Copy, Check, Info, Smartphone, QrCode, 
-  ChevronRight, ArrowLeft, Loader2, ShieldCheck,
-  CreditCard, SmartphoneIcon
+  X, Copy, Check, Info, QrCode, 
+  ChevronRight, ArrowLeft, ShieldCheck,
+  SmartphoneIcon
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'react-toastify';

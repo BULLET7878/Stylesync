@@ -1,22 +1,13 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingCart, Menu, X, Search, LogOut,
-  Heart, ChevronDown, Package, Store, User, Sparkles, Tag
+  Heart, ChevronDown, Package, Store, User
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
-
-const NAV_CATEGORIES = [
-  { label: 'Shirts', value: 'Shirts' },
-  { label: 'T-Shirts', value: 'T-Shirts' },
-  { label: 'Jeans', value: 'Jeans' },
-  { label: 'Shoes', value: 'Shoes' },
-  { label: 'Accessories', value: 'Accessories' },
-  { label: 'Ethnic Wear', value: 'Ethnic Wear' },
-];
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -225,12 +216,12 @@ const Navbar = () => {
         {/* Category Nav Row — Desktop */}
         <div className="hidden md:block border-t border-gray-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-1 h-10 overflow-x-auto scrollbar-hide py-1">
+            <div className="flex items-center gap-1 h-11 overflow-x-auto scrollbar-hide py-1">
               {['All', 'Men', 'Women', 'Kids', 'Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
                 <Link
                   key={cat}
                   to={cat === 'All' ? '/shop' : (['Men', 'Women', 'Kids'].includes(cat) ? `/shop?section=${cat}` : `/shop?category=${cat}`)}
-                  className="whitespace-nowrap px-3 py-1 text-[10px] font-black text-gray-500 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.15em]"
+                  className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-gray-600 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]"
                 >
                   {cat}
                 </Link>

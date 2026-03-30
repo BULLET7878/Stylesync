@@ -1,11 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, ShieldCheck, CreditCard, Loader2, CheckCircle2, Info, Smartphone } from 'lucide-react';
+import { Lock, ShieldCheck, Loader2, CheckCircle2, Smartphone } from 'lucide-react';
 import UPIPaymentModal from '../components/UPIPaymentModal';
 
 const Checkout = () => {
@@ -65,9 +65,10 @@ const Checkout = () => {
   };
 
   useEffect(() => {
-    if (user && user.role === 'seller' && user.email !== 'rahuldhakarmm@gmail.com') {
+    if (user && user.role === 'seller') {
       toast.error('Sellers cannot purchase products.');
       navigate('/dashboard');
+      return;
     }
     if (cartItems.length === 0 && paymentStatus === 'idle') {
       navigate('/cart');

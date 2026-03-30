@@ -30,6 +30,9 @@ const seller = (req, res, next) => {
   }
 };
 
+// Keep admin check tied to owner email
+
+
 const admin = (req, res, next) => {
   if (req.user && req.user.email === OWNER_EMAIL) {
     next();

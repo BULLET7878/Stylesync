@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -36,7 +36,7 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
-  const hasFetched = React.useRef(false);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     if (authLoading) return;

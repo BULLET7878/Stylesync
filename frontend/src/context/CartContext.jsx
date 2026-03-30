@@ -1,8 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
 export const CartContext = createContext({});
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
@@ -38,8 +40,6 @@ export const CartProvider = ({ children }) => {
       }
     }
   }, [user]);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
   const fetchCart = async () => {
     try {

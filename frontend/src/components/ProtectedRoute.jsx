@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
@@ -15,16 +15,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (!user) {
-    // Redirect unauthenticated to login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requiredRole && user.role !== requiredRole && user.role !== 'admin') {
-    // Redirect sellers away from buyer-only pages and vice versa
-    if (requiredRole === 'seller') {
-      return <Navigate to="/register?role=seller" replace />;
-    }
-    // Buyers trying to access seller pages → back to home
+    // Non-seller trying to access seller pages → home
     return <Navigate to="/" replace />;
   }
 

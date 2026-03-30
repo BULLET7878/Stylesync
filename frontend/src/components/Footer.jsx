@@ -1,6 +1,7 @@
+import { useContext } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Mail, MapPin, Phone, ExternalLink } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
-import { useLocation } from 'react-router-dom';
 
 const Footer = () => {
   const { user } = useContext(AuthContext);

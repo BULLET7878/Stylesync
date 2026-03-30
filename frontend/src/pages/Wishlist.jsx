@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { WishlistContext } from '../context/WishlistContext';
 import ProductCard from '../components/ProductCard';
 import { Heart, ShoppingBag } from 'lucide-react';
