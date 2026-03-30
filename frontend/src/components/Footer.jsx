@@ -9,9 +9,9 @@ const Footer = () => {
     <footer className="bg-gray-900 text-gray-400 mt-auto">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-4">
             <Link to="/" className="flex items-center gap-2.5 mb-4">
               <img src="/logo.png?v=5" alt="logo" className="h-10 w-auto object-contain invert mix-blend-screen" />
               <div className="flex items-center text-white font-black">
@@ -29,7 +29,7 @@ const Footer = () => {
           </div>
 
           {/* Shop */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Shop</h4>
             <ul className="space-y-2.5 text-sm">
               {[
@@ -46,7 +46,7 @@ const Footer = () => {
           </div>
 
           {/* Buyers */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyers</h4>
             <ul className="space-y-2.5 text-sm">
               {[
@@ -62,7 +62,7 @@ const Footer = () => {
 
           {/* Sellers - Only visible to owner */}
           {user?.email === 'rahuldhakarmm@gmail.com' && (
-            <div>
+            <div className="lg:col-span-2">
               <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Sellers</h4>
               <ul className="space-y-2.5 text-sm">
                 {[
@@ -78,7 +78,7 @@ const Footer = () => {
           )}
 
           {/* Support */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Support</h4>
             <ul className="space-y-2.5 text-sm">
               {[
