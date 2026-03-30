@@ -120,7 +120,7 @@ const Home = () => {
           {[
             { name: 'Men', img: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?auto=format&fit=crop&q=80', color: 'from-blue-600/40' },
             { name: 'Women', img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80', color: 'from-pink-600/40' },
-            { name: 'Kids', img: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=80', color: 'from-amber-500/40' },
+            { name: 'Kids', img: '/assets/kids_hero.png', color: 'from-amber-500/40' },
           ].map((sec) => (
             <Link 
               key={sec.name} 
