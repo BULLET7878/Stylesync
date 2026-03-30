@@ -96,6 +96,17 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: {
     type: Date,
   },
+  trackingNumber: {
+    type: String,
+    default: '',
+  },
+  courier: {
+    type: String,
+    default: '',
+  },
+  shippedAt: {
+    type: Date,
+  },
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

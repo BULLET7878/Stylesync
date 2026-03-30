@@ -96,19 +96,10 @@ const getSellerOrders = async (req, res) => {
     // Find orders that contain any of these products
     const orders = await Order.find({
       'orderItems.product': { $in: productIds }
-    }).populate('user', 'name email').sort({ createdAt: -1 });
+    }).populate('user', 'name email phone').sort({ createdAt: -1 });
 
-    // Privacy Masking: Remove sensitive address fields for sellers
-    const maskedOrders = orders.map(order => {
-      const o = order.toObject();
-      if (o.shippingAddress) {
-        o.shippingAddress.address = '*** Masked for Privacy ***';
-        o.shippingAddress.houseNumber = '***';
-      }
-      return o;
-    });
-
-    res.json(maskedOrders);
+    // Return full address — seller needs it to ship the order
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -199,9 +190,47 @@ const updateOrderToPaid = async (req, res) => {
   }
 };
 
-// @desc    Update order to delivered
-// @route   PUT /api/orders/:id/deliver
+// @desc    Update order to shipped (By Seller)
+// @route   PUT /api/orders/:id/ship
 // @access  Private/Seller
+const updateOrderToShipped = async (req, res) => {
+  try {
+    const { trackingNumber, courier } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      order.status = 'Shipped';
+      order.trackingNumber = trackingNumber || '';
+      order.courier = courier || '';
+      order.shippedAt = Date.now();
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Cancel order (By Buyer — only if not yet paid/shipped)
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.user.toString() !== req.user._id.toString())
+      return res.status(403).json({ message: 'Not authorized' });
+    if (order.isPaid || ['Shipped', 'Delivered'].includes(order.status))
+      return res.status(400).json({ message: 'Cannot cancel an order that is already paid or shipped' });
+    order.status = 'Cancelled';
+    order.paymentStatus = 'failed';
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const updateOrderToDelivered = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -341,7 +370,9 @@ module.exports = {
   getMyOrders,
   getSellerOrders,
   updateOrderToPaid,
+  updateOrderToShipped,
   updateOrderToDelivered,
+  cancelOrder,
   getAdminStats,
   submitPaymentDetails,
   confirmOrderPayment,

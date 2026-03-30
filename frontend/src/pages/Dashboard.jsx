@@ -106,19 +106,32 @@ const Dashboard = () => {
 
   const handleReorder = async (item) => {
     try {
-      // Create a mock product object that addToCart expects
       const productObj = {
         _id: item.product,
         name: item.name,
         image: item.image,
         price: item.price,
-        countInStock: 99 // Assume stock is available, backend will verify
+        countInStock: 99
       };
       await addToCart(productObj, 1);
       toast.success(`${item.name} added to cart!`);
       navigate('/checkout');
     } catch (error) {
       toast.error(error.message || 'Failed to reorder');
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Cancel this order?')) return;
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      await axios.put(`${API_URL}/api/orders/${orderId}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      setOrders(orders.map(o => o._id === orderId ? { ...o, status: 'Cancelled', paymentStatus: 'failed' } : o));
+      toast.success('Order cancelled');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Cannot cancel this order');
     }
   };
 
@@ -375,9 +388,30 @@ const Dashboard = () => {
                           ))}
                         </div>
 
-                        {/* Shipping */}
-                        <div className="mt-3 pt-3 border-t border-gray-50 text-xs text-gray-500">
-                          <span className="font-medium">Ship to:</span> {order.shippingAddress?.address}, {order.shippingAddress?.city} — {order.shippingAddress?.postalCode}
+                        {/* Tracking info (if shipped) */}
+                        {order.status === 'Shipped' && order.trackingNumber && (
+                          <div className="mt-3 pt-3 border-t border-gray-50 bg-purple-50 rounded-xl px-4 py-3 flex items-center gap-3">
+                            <Truck className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                            <div className="text-xs">
+                              <p className="font-black text-purple-800">{order.courier} — In Transit</p>
+                              <p className="text-purple-600 font-mono select-all">{order.trackingNumber}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Shipping address + cancel */}
+                        <div className="mt-3 pt-3 border-t border-gray-50 flex items-center justify-between gap-3">
+                          <p className="text-xs text-gray-500">
+                            <span className="font-medium">Ship to:</span> {order.shippingAddress?.address}, {order.shippingAddress?.city} — {order.shippingAddress?.postalCode}
+                          </p>
+                          {!order.isPaid && order.status !== 'Cancelled' && !['Shipped', 'Delivered'].includes(order.status) && (
+                            <button
+                              onClick={() => handleCancelOrder(order._id)}
+                              className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-all flex-shrink-0"
+                            >
+                              Cancel Order
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
