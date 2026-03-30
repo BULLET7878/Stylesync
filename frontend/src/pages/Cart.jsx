@@ -35,7 +35,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-black text-gray-900">Shopping Cart</h1>

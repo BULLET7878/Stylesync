@@ -194,7 +194,7 @@ const Info = () => {
   const current = sections[path] || sections['about'];
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="bg-[#fafafa]">
       {/* Header Splash */}
       <div className="h-[30vh] bg-gray-900 flex flex-col items-center justify-center text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
