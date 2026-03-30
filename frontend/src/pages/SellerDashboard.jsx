@@ -358,7 +358,8 @@ const SellerDashboard = () => {
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
                     <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Order</th>
-                    <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Buyer</th>
+                    <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Buyer & Location</th>
+                    <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Items</th>
                     <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Amount</th>
                     <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">Payment</th>
                     <th className="px-5 py-3 text-xs font-black text-gray-500 uppercase tracking-wider">UTR</th>
@@ -368,7 +369,7 @@ const SellerDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {orders.length === 0 ? (
-                    <tr><td colSpan="7" className="px-5 py-12 text-center text-gray-400 text-sm">No orders yet</td></tr>
+                    <tr><td colSpan="8" className="px-5 py-12 text-center text-gray-400 text-sm">No orders yet</td></tr>
                   ) : orders.map(order => (
                     <tr key={order._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-4">
@@ -377,7 +378,24 @@ const SellerDashboard = () => {
                       </td>
                       <td className="px-5 py-4">
                         <p className="text-sm font-bold text-gray-900">{order.user?.name}</p>
-                        <p className="text-xs text-gray-400 truncate max-w-[120px]">{order.user?.email}</p>
+                        <p className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                          <Clock className="w-2.5 h-2.5" /> {order.shippingAddress?.city}, {order.shippingAddress?.state}
+                        </p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex -space-x-2">
+                          {order.orderItems.map((item, i) => (
+                            <div key={i} title={item.name} className="w-8 h-8 rounded-lg border-2 border-white bg-gray-100 overflow-hidden ring-1 ring-gray-100">
+                              <img src={item.image?.startsWith('http') ? item.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.image}`}
+                                alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
+                            </div>
+                          ))}
+                          {order.orderItems.length > 3 && (
+                            <div className="w-8 h-8 rounded-lg border-2 border-white bg-gray-200 flex items-center justify-center text-[10px] font-black text-gray-600">
+                              +{order.orderItems.length - 3}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-sm font-black text-gray-900">₹{order.totalPrice.toLocaleString()}</td>
                       <td className="px-5 py-4">

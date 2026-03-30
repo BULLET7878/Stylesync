@@ -25,8 +25,6 @@ const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
-  const [sellerOrders, setSellerOrders] = useState([]);
-  const [activeTab, setActiveTab] = useState('purchases');
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -79,18 +77,11 @@ const Dashboard = () => {
     if (!user) { navigate('/login'); return; }
     const fetchOrders = async () => {
       try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
         const { data: myOrders } = await axios.get(`${API_URL}/api/orders/myorders`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setOrders(myOrders);
-
-        if (user.role === 'seller') {
-          const { data: sOrders } = await axios.get(`${API_URL}/api/orders/seller`, {
-            headers: { Authorization: `Bearer ${user.token}` }
-          });
-          setSellerOrders(sOrders);
-          if (myOrders.length === 0 && sOrders.length > 0) setActiveTab('sales');
-        }
       } catch (e) { console.error(e); }
       setLoading(false);
     };
@@ -181,13 +172,27 @@ const Dashboard = () => {
               <Link to="/shop" className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
                 <span>Browse Shop</span><ChevronRight className="w-4 h-4 text-gray-400" />
               </Link>
-              {user.email === 'rahuldhakarmm@gmail.com' && (
+              {user.role === 'seller' && (
                 <Link to="/seller/dashboard" className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors text-sm font-bold text-amber-700">
                   <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Seller Panel</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               )}
             </div>
+
+            {/* Seller Mode Shortcut Banner */}
+            {user.role === 'seller' && (
+              <div className="bg-gradient-to-br from-indigo-600 to-primary-700 rounded-2xl p-6 text-white shadow-lg overflow-hidden relative group">
+                <div className="relative z-10">
+                  <h4 className="text-lg font-black mb-1">Seller Mode</h4>
+                  <p className="text-xs text-indigo-100 mb-4 leading-relaxed">Manage your listings, track sales, and grow your brand.</p>
+                  <Link to="/seller/dashboard" className="inline-flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-xl text-xs font-black hover:bg-indigo-50 transition-all">
+                    Open Channel <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+                <Store className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 group-hover:scale-110 transition-transform duration-500" />
+              </div>
+            )}
 
             {/* Saved Address */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
@@ -250,74 +255,61 @@ const Dashboard = () => {
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5 text-primary-600" /> 
-                  {user.role === 'seller' ? 'Order Management' : 'Order History'}
+                  {user.role === 'seller' ? 'My Activity' : 'Order History'}
                 </h2>
-
-                {/* Purchased Products Summary (Buyer only) */}
-                {user.role === 'buyer' && orders.length > 0 && (
-                  <div className="mb-10">
-                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">My Collection</h3>
-                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                      {Array.from(new Set(orders.map(o => o.orderItems.map(i => JSON.stringify({id: i.product, name: i.name, img: i.image}))).flat()))
-                        .map(itemStr => {
-                          const item = JSON.parse(itemStr);
-                          return (
-                            <Link key={item.id} to={`/product/${item.id}`} className="flex-shrink-0 group">
-                              <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 group-hover:border-primary-400 transition-colors">
-                                <img src={item.img?.startsWith('http') ? item.img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.img}`} 
-                                  className="w-full h-full object-cover" 
-                                  alt={item.name}
-                                  onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
-                              </div>
-                            </Link>
-                          );
-                        })}
-                    </div>
-                  </div>
-                )}
                 {user.role === 'seller' && (
-                  <div className="flex bg-gray-100 p-1 rounded-xl">
-                    <button 
-                      onClick={() => setActiveTab('purchases')}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'purchases' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
-                    >
-                      My Purchases
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('sales')}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'sales' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}
-                    >
-                      Recent Sales
-                    </button>
-                  </div>
+                  <Link to="/seller/dashboard" className="text-xs font-bold text-primary-600 hover:text-primary-700 underline flex items-center gap-1">
+                    Manage My Store →
+                  </Link>
                 )}
               </div>
+
+              {/* Purchased Products Summary (Buyer only) */}
+              {user.role === 'buyer' && orders.length > 0 && (
+                <div className="mb-10">
+                  <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">My Collection</h3>
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                    {Array.from(new Set(orders.map(o => o.orderItems.map(i => JSON.stringify({id: i.product, name: i.name, img: i.image}))).flat()))
+                      .map(itemStr => {
+                        const item = JSON.parse(itemStr);
+                        return (
+                          <Link key={item.id} to={`/product/${item.id}`} className="flex-shrink-0 group">
+                            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 group-hover:border-primary-400 transition-colors">
+                              <img src={item.img?.startsWith('http') ? item.img : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${item.img}`} 
+                                className="w-full h-full object-cover" 
+                                alt={item.name}
+                                onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
+                            </div>
+                          </Link>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
 
               {loading ? (
                 <div className="space-y-3">
                   {[1,2,3].map(n => <div key={n} className="skeleton rounded-xl h-28" />)}
                 </div>
-              ) : (activeTab === 'purchases' ? orders : sellerOrders).length === 0 ? (
+              ) : orders.length === 0 ? (
                 <div className="text-center py-16 border-2 border-dashed border-gray-100 rounded-2xl">
                   <Package className="w-12 h-12 text-gray-200 mx-auto mb-3" />
                   <h3 className="font-bold text-gray-900 mb-1">
-                    {activeTab === 'purchases' ? 'No purchases yet' : 'No sales yet'}
+                    No orders yet
                   </h3>
                   <p className="text-gray-500 text-sm mb-5">
-                    {activeTab === 'purchases' 
-                      ? 'Your orders will appear here once you shop.' 
-                      : 'Received orders will appear here once customers buy your products.'}
+                    Your orders will appear here once you shop.
                   </p>
                   <Link 
-                    to={activeTab === 'purchases' ? "/shop" : "/seller/dashboard"} 
+                    to="/shop" 
                     className="bg-primary-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-700 transition-all"
                   >
-                    {activeTab === 'purchases' ? 'Start Shopping' : 'Manage Inventory'}
+                    Start Shopping
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {(activeTab === 'purchases' ? orders : sellerOrders).map(order => {
+                  {orders.map(order => {
                     const statusCfg = STATUS_CONFIG[order.status] || STATUS_CONFIG['Pending'];
                     const paymentCfg = PAYMENT_CONFIG[order.paymentStatus] || PAYMENT_CONFIG['pending'];
                     return (

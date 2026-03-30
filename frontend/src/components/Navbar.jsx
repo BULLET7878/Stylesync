@@ -235,7 +235,7 @@ const Navbar = () => {
                   {cat}
                 </Link>
               ))}
-              {user?.email === 'rahuldhakarmm@gmail.com' && (
+              {user?.role === 'seller' && (
                 <div className="ml-auto flex-shrink-0">
                   <Link
                     to="/seller/dashboard"
@@ -306,7 +306,7 @@ const Navbar = () => {
                       <Link to="/wishlist" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
                         <Heart className="w-4 h-4 text-gray-400" /> Wishlist
                       </Link>
-                      {user?.email === 'rahuldhakarmm@gmail.com' && (
+                      {user?.role === 'seller' && (
                         <Link to="/seller/dashboard" className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 text-amber-700 font-bold text-sm">
                           <Store className="w-4 h-4" /> Seller Panel
                         </Link>
