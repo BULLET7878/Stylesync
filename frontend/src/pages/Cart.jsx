@@ -4,6 +4,8 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { Trash2, ArrowRight, ShoppingBag, Plus, Minus, Truck, Tag, ShieldCheck } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { imgUrl } from '../utils/imgUrl';
+import API_URL from '../utils/api';
 
 const Cart = () => {
   const { cartItems, addToCart, removeFromCart } = useContext(CartContext);
@@ -49,7 +51,7 @@ const Cart = () => {
               <div key={item.product} className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 hover:shadow-sm transition-shadow">
                 <Link to={`/product/${item.product}`} className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
                   <img
-                    src={item.image?.startsWith('http') ? item.image : `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001')).replace(/\/$/, '')}/${item.image?.replace(/^\//, '')}`}
+                    src={imgUrl(item.image)}
                     alt={item.name}
                     className="w-full h-full object-cover"
                     onError={(e) => { e.target.src = '/assets/fallback.png'; }}

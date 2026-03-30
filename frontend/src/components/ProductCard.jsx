@@ -5,9 +5,7 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
-const FALLBACK = '/assets/fallback.png';
+import { imgUrl, FALLBACK_IMG } from '../utils/imgUrl';
 
 const ProductCard = ({ product }) => {
   const { user } = useContext(AuthContext);
@@ -25,11 +23,7 @@ const ProductCard = ({ product }) => {
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
   const isNew = product.createdAt && (Date.now() - new Date(product.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
-  const imgSrc = product.images?.length > 0 && product.images[0]
-    ? (product.images[0].startsWith('http') 
-        ? product.images[0] 
-        : `${API.replace(/\/$/, '')}/${product.images[0].replace(/^\//, '')}`)
-    : FALLBACK;
+  const imgSrc = imgUrl(product.images?.[0]);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -57,7 +51,7 @@ const ProductCard = ({ product }) => {
           src={imgSrc}
           alt={product.title}
           loading="lazy"
-          onError={(e) => { e.target.src = FALLBACK; }}
+          onError={(e) => { e.target.src = FALLBACK_IMG; }}
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isOutOfStock ? 'opacity-60 grayscale' : ''}`}
         />
 

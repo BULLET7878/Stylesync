@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 import { toast } from 'react-toastify';
+import API_URL from '../utils/api';
 
 export const WishlistContext = createContext();
 
@@ -14,7 +15,6 @@ export const WishlistProvider = ({ children }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -43,7 +43,6 @@ export const WishlistProvider = ({ children }) => {
       return;
     }
     try {
-      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -59,7 +58,6 @@ export const WishlistProvider = ({ children }) => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,

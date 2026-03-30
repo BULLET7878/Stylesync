@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../utils/api';
 
 export const ProductContext = createContext({});
 
@@ -7,8 +8,6 @@ export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [curatedProducts, setCuratedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
 
   const searchProducts = async (keyword = '', category = '', sort = '', minPrice = '', maxPrice = '', rating = '', section = '') => {
     setLoading(true);

@@ -8,8 +8,8 @@ import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
-const FALLBACK = '/assets/fallback.png';
+import { imgUrl } from '../utils/imgUrl';
+import API_URL from '../utils/api';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -34,11 +34,11 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${API}/api/products/${id}`);
+        const { data } = await axios.get(`${API_URL}/api/products/${id}`);
         setProduct(data);
         const [outfitRes, alsoRes] = await Promise.allSettled([
-          axios.get(`${API}/api/featured/pairings/${id}`),
-          axios.get(`${API}/api/products?category=${encodeURIComponent(data.category)}`),
+          axios.get(`${API_URL}/api/featured/pairings/${id}`),
+          axios.get(`${API_URL}/api/products?category=${encodeURIComponent(data.category)}`),
         ]);
         if (outfitRes.status === 'fulfilled') setOutfits(outfitRes.value.data.slice(0, 4));
         if (alsoRes.status === 'fulfilled') setAlsoBought(alsoRes.value.data.filter(p => p._id !== id).slice(0, 4));
@@ -79,12 +79,12 @@ const ProductDetail = () => {
     if (rating === 0) { toast.error('Please select a rating'); return; }
     setSubmittingReview(true);
     try {
-      await axios.post(`${API}/api/products/${id}/reviews`, { rating, comment }, {
+      await axios.post(`${API_URL}/api/products/${id}/reviews`, { rating, comment }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       toast.success('Review submitted!');
       setRating(0); setComment('');
-      const { data } = await axios.get(`${API}/api/products/${id}`);
+      const { data } = await axios.get(`${API_URL}/api/products/${id}`);
       setProduct(data);
     } catch (e) { toast.error(e.response?.data?.message || 'Failed to submit review'); }
     setSubmittingReview(false);
@@ -109,9 +109,7 @@ const ProductDetail = () => {
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.discountPrice / product.price) * 100) : 0;
   const images = product.images?.length > 0 ? product.images : [FALLBACK];
-  const imgSrc = (src) => src?.startsWith('http') 
-    ? src 
-    : `${API.replace(/\/$/, '')}/${src?.replace(/^\//, '')}`;
+  const imgSrc = (src) => imgUrl(src);
 
   return (
     <div className="bg-gray-50">

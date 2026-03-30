@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ProductContext } from '../context/ProductContext';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
+import { imgUrl } from '../utils/imgUrl';
 import { AuthContext } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, Search, Star, X, SlidersHorizontal, LayoutGrid, List, ShoppingCart, Heart } from 'lucide-react';
@@ -291,10 +292,8 @@ const ListProductCard = ({ product }) => {
   const isWishlisted = isInWishlist(product._id);
   const hasDiscount = product.discountPrice > 0 && product.discountPrice < product.price;
   const displayPrice = hasDiscount ? product.discountPrice : product.price;
-  const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
-  const imgSrc = product.images?.[0]?.startsWith('http') 
-    ? product.images[0] 
-    : `${API.replace(/\/$/, '')}/${product.images?.[0]?.replace(/^\//, '')}`;
+  const API = import.meta.env.VITE_API_URL || '';
+  const imgSrc = imgUrl(product.images?.[0]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 hover:shadow-md transition-shadow">

@@ -9,8 +9,8 @@ import {
   ChevronDown, ChevronUp, Search, X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5001');
+import { imgUrl } from '../utils/imgUrl';
+import API_URL from '../utils/api';
 
 const StatCard = ({ label, value, sub, icon, color = 'primary' }) => {
   const colors = {
@@ -285,7 +285,7 @@ const SellerDashboard = () => {
                   <div key={i} className="flex items-center gap-3">
                     <span className="text-xs font-black text-gray-300 w-4">#{i+1}</span>
                     <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${API_URL.replace(/\/$/, '')}/${p.images?.[0]?.replace(/^\//, '')}`}
+                      <img src={imgUrl(p.images?.[0])}
                         alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -365,7 +365,7 @@ const SellerDashboard = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                            <img src={p.images?.[0]?.startsWith('http') ? p.images[0] : `${API_URL.replace(/\/$/, '')}/${p.images?.[0]?.replace(/^\//, '')}`}
+                            <img src={imgUrl(p.images?.[0])}
                               alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                           </div>
                           <span className="text-sm font-bold text-gray-900 max-w-[180px] truncate">{p.title}</span>
@@ -453,7 +453,7 @@ const SellerDashboard = () => {
                           <div className="flex -space-x-2 flex-shrink-0">
                             {order.orderItems.slice(0, 3).map((item, i) => (
                               <div key={i} title={item.name} className="w-8 h-8 rounded-lg border-2 border-white bg-gray-100 overflow-hidden ring-1 ring-gray-100">
-                                <img src={item.image?.startsWith('http') ? item.image : `${API_URL.replace(/\/$/, '')}/${item.image?.replace(/^\//, '')}`}
+                                <img src={imgUrl(item.image)}
                                   alt="" className="w-full h-full object-cover" onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                               </div>
                             ))}
@@ -526,7 +526,7 @@ const SellerDashboard = () => {
                               <div className="space-y-2 mb-3">
                                 {order.orderItems.map((item, i) => (
                                   <div key={i} className="flex items-center gap-2">
-                                    <img src={item.image?.startsWith('http') ? item.image : `${API_URL.replace(/\/$/, '')}/${item.image?.replace(/^\//, '')}`}
+                                    <img src={imgUrl(item.image)}
                                       alt="" className="w-8 h-8 rounded-lg object-cover bg-gray-100 flex-shrink-0"
                                       onError={(e) => { e.target.src = '/assets/fallback.png'; }} />
                                     <div className="flex-1 min-w-0">
