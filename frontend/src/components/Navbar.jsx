@@ -45,14 +45,23 @@ const Navbar = () => {
     }
   };
 
+  const isSeller = user?.role === 'seller';
   const cartCount = (cartItems || []).reduce((acc, item) => acc + item.qty, 0);
 
   return (
     <>
-      {/* Announcement Bar */}
-      <div className="bg-primary-600 text-white text-xs font-semibold text-center py-2 px-4 tracking-wide">
-        🎉 Free shipping on orders above ₹999 &nbsp;·&nbsp; Use code <span className="font-black underline">STYLE10</span> for 10% off
-      </div>
+      {/* Announcement Bar — buyers only */}
+      {!isSeller && (
+        <div className="bg-primary-600 text-white text-xs font-semibold text-center py-2 px-4 tracking-wide">
+          🎉 Free shipping on orders above ₹999 &nbsp;·&nbsp; Use code <span className="font-black underline">STYLE10</span> for 10% off
+        </div>
+      )}
+      {/* Seller announcement bar */}
+      {isSeller && (
+        <div className="bg-amber-600 text-white text-xs font-semibold text-center py-2 px-4 tracking-wide">
+          Seller Mode — <Link to="/seller/dashboard" className="underline font-black">Open Dashboard</Link> &nbsp;·&nbsp; <Link to="/seller/product/new" className="underline font-black">Add Product</Link>
+        </div>
+      )}
 
       <nav className="bg-white sticky top-0 z-[100] border-b border-gray-200 shadow-sm">
         {/* Main Row */}
@@ -100,38 +109,42 @@ const Navbar = () => {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1">
-              {/* Wishlist */}
-              <Link
-                to="/wishlist"
-                className="relative p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all hidden md:flex"
-                title="Wishlist"
-              >
-                <Heart className="w-5 h-5" />
-                {wishlist?.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5 border-2 border-white">
-                    {wishlist.length > 9 ? '9+' : wishlist.length}
-                  </span>
-                )}
-              </Link>
+              {/* Wishlist — buyers only */}
+              {!isSeller && (
+                <Link
+                  to="/wishlist"
+                  className="relative p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all hidden md:flex"
+                  title="Wishlist"
+                >
+                  <Heart className="w-5 h-5" />
+                  {wishlist?.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-black rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-0.5 border-2 border-white">
+                      {wishlist.length > 9 ? '9+' : wishlist.length}
+                    </span>
+                  )}
+                </Link>
+              )}
 
-              {/* Cart */}
-              <Link
-                to="/cart"
-                className="relative p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
-                title="Cart"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <motion.span
-                    key={cartCount}
-                    initial={{ scale: 0.5 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-0.5 -right-0.5 bg-primary-600 text-white text-[9px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 border-2 border-white"
-                  >
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </motion.span>
-                )}
-              </Link>
+              {/* Cart — buyers only */}
+              {!isSeller && (
+                <Link
+                  to="/cart"
+                  className="relative p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+                  title="Cart"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <motion.span
+                      key={cartCount}
+                      initial={{ scale: 0.5 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-0.5 -right-0.5 bg-primary-600 text-white text-[9px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 border-2 border-white"
+                    >
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </motion.span>
+                  )}
+                </Link>
+              )}
 
               {/* User Menu */}
               {user ? (
@@ -164,18 +177,22 @@ const Navbar = () => {
                           </span>
                         </div>
                         <div className="py-1">
-                          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            <User className="w-4 h-4 text-gray-400" /> My Account
-                          </Link>
-                          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            <Package className="w-4 h-4 text-gray-400" /> My Orders
-                          </Link>
-                          <Link to="/wishlist" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            <Heart className="w-4 h-4 text-gray-400" /> Wishlist
-                          </Link>
-                          {user.role === 'seller' && (
+                          {!isSeller && (
+                            <>
+                              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                <User className="w-4 h-4 text-gray-400" /> My Account
+                              </Link>
+                              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                <Package className="w-4 h-4 text-gray-400" /> My Orders
+                              </Link>
+                              <Link to="/wishlist" className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                <Heart className="w-4 h-4 text-gray-400" /> Wishlist
+                              </Link>
+                            </>
+                          )}
+                          {isSeller && (
                             <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-50 transition-colors">
-                              <Store className="w-4 h-4" /> Seller Panel
+                              <Store className="w-4 h-4" /> Seller Dashboard
                             </Link>
                           )}
                         </div>
@@ -213,32 +230,45 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Category Nav Row — Desktop */}
+        {/* Category Nav Row — buyers only */}
+        {!isSeller && (
         <div className="hidden md:block border-t border-gray-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-1 h-11 overflow-x-auto scrollbar-hide py-1">
-              {['All', 'Men', 'Women', 'Kids', 'Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
-                <Link
-                  key={cat}
-                  to={cat === 'All' ? '/shop' : (['Men', 'Women', 'Kids'].includes(cat) ? `/shop?section=${cat}` : `/shop?category=${cat}`)}
-                  className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-gray-600 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]"
-                >
+              <Link to="/shop" className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-gray-600 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]">All</Link>
+              <span className="w-px h-4 bg-gray-200 mx-1 flex-shrink-0" />
+              {['Men', 'Women', 'Kids'].map(sec => (
+                <Link key={sec}
+                  to={`/shop?section=${sec}`}
+                  className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-primary-700 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]">
+                  {sec}
+                </Link>
+              ))}
+              <span className="w-px h-4 bg-gray-200 mx-1 flex-shrink-0" />
+              {['Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
+                <Link key={cat}
+                  to={`/shop?category=${cat}`}
+                  className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-gray-600 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]">
                   {cat}
                 </Link>
               ))}
-              {user?.role === 'seller' && (
-                <div className="ml-auto flex-shrink-0">
-                  <Link
-                    to="/seller/dashboard"
-                    className="flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all border border-amber-200"
-                  >
-                    <Store className="w-3 h-3" /> Seller Panel
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         </div>
+        )}
+
+        {/* Seller quick-nav row */}
+        {isSeller && (
+        <div className="hidden md:block border-t border-amber-100 bg-amber-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-4 h-11">
+              <Link to="/seller/dashboard" className="text-xs font-black text-amber-700 hover:text-amber-900 uppercase tracking-widest transition-colors">Dashboard</Link>
+              <Link to="/seller/product/new" className="text-xs font-black text-amber-700 hover:text-amber-900 uppercase tracking-widest transition-colors">+ Add Product</Link>
+              <Link to="/seller/dashboard" className="text-xs font-black text-amber-700 hover:text-amber-900 uppercase tracking-widest transition-colors">Orders</Link>
+            </div>
+          </div>
+        </div>
+        )}
 
         {/* Mobile Menu */}
         <AnimatePresence>
@@ -262,7 +292,8 @@ const Navbar = () => {
                   />
                 </form>
 
-                {/* Mobile Categories */}
+                {/* Mobile Categories — buyers only */}
+                {!isSeller && (
                 <div className="flex flex-wrap gap-2 pt-2">
                   {['Men', 'Women', 'Kids', 'Shirts', 'Shoes', 'Jeans', 'Ethnic'].map((cat) => (
                     <button 
@@ -278,6 +309,7 @@ const Navbar = () => {
                     </button>
                   ))}
                 </div>
+                )}
 
                 <div className="border-t border-gray-100 pt-3 space-y-1">
                   {user ? (
@@ -291,15 +323,19 @@ const Navbar = () => {
                           <span className={`text-[10px] font-black uppercase ${user.role === 'seller' ? 'text-amber-600' : 'text-primary-600'}`}>{user.role}</span>
                         </div>
                       </div>
-                      <Link to="/dashboard" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
-                        <Package className="w-4 h-4 text-gray-400" /> My Orders
-                      </Link>
-                      <Link to="/wishlist" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
-                        <Heart className="w-4 h-4 text-gray-400" /> Wishlist
-                      </Link>
-                      {user?.role === 'seller' && (
+                      {!isSeller && (
+                        <>
+                          <Link to="/dashboard" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
+                            <Package className="w-4 h-4 text-gray-400" /> My Orders
+                          </Link>
+                          <Link to="/wishlist" className="flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium text-sm">
+                            <Heart className="w-4 h-4 text-gray-400" /> Wishlist
+                          </Link>
+                        </>
+                      )}
+                      {isSeller && (
                         <Link to="/seller/dashboard" className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 text-amber-700 font-bold text-sm">
-                          <Store className="w-4 h-4" /> Seller Panel
+                          <Store className="w-4 h-4" /> Seller Dashboard
                         </Link>
                       )}
                       <button

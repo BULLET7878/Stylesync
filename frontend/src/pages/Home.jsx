@@ -8,14 +8,35 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { imgUrl } from '../utils/imgUrl';
 
-const CATEGORIES = [
-  { label: 'Shirts', value: 'Shirts', emoji: '👔', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100' },
-  { label: 'T-Shirts', value: 'T-Shirts', emoji: '👕', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
-  { label: 'Jeans', value: 'Jeans', emoji: '👖', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100' },
-  { label: 'Shoes', value: 'Shoes', emoji: '👟', bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-100' },
-  { label: 'Accessories', value: 'Accessories', emoji: '👜', bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-100' },
-  { label: 'Ethnic Wear', value: 'Ethnic Wear', emoji: '🥻', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
-];
+const SECTION_CATEGORIES = {
+  Men: [
+    { label: 'Shirts', emoji: '👔', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100' },
+    { label: 'T-Shirts', emoji: '👕', bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-100' },
+    { label: 'Jeans', emoji: '👖', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100' },
+    { label: 'Trousers', emoji: '🩳', bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-100' },
+    { label: 'Shoes', emoji: '👟', bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-100' },
+    { label: 'Accessories', emoji: '⌚', bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200' },
+    { label: 'Ethnic Wear', emoji: '🧥', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
+  ],
+  Women: [
+    { label: 'Ethnic Wear', emoji: '🥻', bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-100' },
+    { label: 'T-Shirts', emoji: '👚', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-100' },
+    { label: 'Jeans', emoji: '👖', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-100' },
+    { label: 'Trousers', emoji: '👗', bg: 'bg-fuchsia-50', text: 'text-fuchsia-700', border: 'border-fuchsia-100' },
+    { label: 'Shoes', emoji: '👠', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-100' },
+    { label: 'Accessories', emoji: '👜', bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-100' },
+    { label: 'Shirts', emoji: '👔', bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-100' },
+  ],
+  Kids: [
+    { label: 'T-Shirts', emoji: '👕', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
+    { label: 'Jeans', emoji: '👖', bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-100' },
+    { label: 'Shoes', emoji: '👟', bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-100' },
+    { label: 'Ethnic Wear', emoji: '🥻', bg: 'bg-lime-50', text: 'text-lime-700', border: 'border-lime-100' },
+    { label: 'Accessories', emoji: '🎒', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100' },
+    { label: 'Shirts', emoji: '👔', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100' },
+    { label: 'Trousers', emoji: '🩳', bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-100' },
+  ],
+};
 
 const TRUST_BADGES = [
   { icon: <Truck className="w-5 h-5" />, title: 'Free Delivery', sub: 'On orders above ₹999' },
@@ -30,6 +51,7 @@ const Home = () => {
   const { products, loading } = useContext(ProductContext);
   const { user } = useContext(AuthContext);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [activeSection, setActiveSection] = useState('Men');
 
   useEffect(() => {
     const fetchRecentlyViewed = async () => {
@@ -122,20 +144,23 @@ const Home = () => {
             { name: 'Women', img: '/assets/women_hero.png', color: 'from-pink-600/40' },
             { name: 'Kids', img: '/assets/kids_hero.png', color: 'from-amber-500/40' },
           ].map((sec) => (
-            <Link 
-              key={sec.name} 
-              to={`/shop?section=${sec.name}`}
-              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden group shadow-2xl transition-transform hover:-translate-y-2"
+            <button
+              key={sec.name}
+              onClick={() => {
+                setActiveSection(sec.name);
+                document.getElementById('section-browser')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden group shadow-2xl transition-transform hover:-translate-y-2 text-left w-full"
             >
               <img src={sec.img} alt={sec.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className={`absolute inset-0 bg-gradient-to-t ${sec.color} to-transparent opacity-60 group-hover:opacity-80 transition-opacity`} />
               <div className="absolute inset-0 flex flex-col justify-end p-8">
                 <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{sec.name}</h3>
                 <div className="flex items-center gap-2 text-white/90 text-sm font-bold bg-white/20 backdrop-blur-md w-fit px-4 py-2 rounded-xl group-hover:bg-white group-hover:text-gray-900 transition-all">
-                  Shop Section <ArrowRight className="w-4 h-4" />
+                  Shop {sec.name} <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       </section>
@@ -159,29 +184,62 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── Category Tiles ── */}
-      <section className="py-14 bg-white">
+      {/* ── Section + Category Browser ── */}
+      <section id="section-browser" className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-xs font-black text-primary-600 uppercase tracking-widest mb-1">Browse by Category</p>
+              <p className="text-xs font-black text-primary-600 uppercase tracking-widest mb-1">Browse by Section</p>
               <h2 className="text-2xl font-black text-gray-900">Shop the Collection</h2>
             </div>
-            <Link to="/shop" className="text-sm font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1">
-              View All <ArrowRight className="w-4 h-4" />
+            <Link to={`/shop?section=${activeSection}`} className="text-sm font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1">
+              View All {activeSection} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.value}
-                to={`/shop?category=${encodeURIComponent(cat.value)}`}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border ${cat.bg} ${cat.border} hover:shadow-md transition-all group`}
+
+          {/* Section tabs */}
+          <div className="flex gap-2 mb-8">
+            {[
+              { key: 'Men', emoji: '👨', color: 'bg-blue-600' },
+              { key: 'Women', emoji: '👩', color: 'bg-pink-500' },
+              { key: 'Kids', emoji: '🧒', color: 'bg-amber-500' },
+            ].map(s => (
+              <button
+                key={s.key}
+                onClick={() => setActiveSection(s.key)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all border-2 ${
+                  activeSection === s.key
+                    ? `${s.color} text-white border-transparent shadow-md`
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                }`}
               >
-                <span className="text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
-                <span className={`text-xs font-bold ${cat.text} text-center`}>{cat.label}</span>
+                <span>{s.emoji}</span> {s.key}
+              </button>
+            ))}
+          </div>
+
+          {/* Category grid for active section */}
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
+            {SECTION_CATEGORIES[activeSection].map((cat) => (
+              <Link
+                key={cat.label}
+                to={`/shop?section=${activeSection}&category=${encodeURIComponent(cat.label)}`}
+                className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-2xl border ${cat.bg} ${cat.border} hover:shadow-md transition-all group`}
+              >
+                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                <span className={`text-[10px] sm:text-xs font-bold ${cat.text} text-center leading-tight`}>{cat.label}</span>
               </Link>
             ))}
+          </div>
+
+          {/* Shop all CTA for this section */}
+          <div className="mt-6 flex justify-center">
+            <Link
+              to={`/shop?section=${activeSection}`}
+              className="inline-flex items-center gap-2 border-2 border-gray-200 text-gray-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:border-primary-400 hover:text-primary-600 transition-all"
+            >
+              All {activeSection}'s Products <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

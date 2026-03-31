@@ -77,6 +77,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
+    // Seller has their own dedicated dashboard
+    if (user.role === 'seller') { navigate('/seller/dashboard'); return; }
     const fetchOrders = async () => {
       try {
         const { data: myOrders } = await axios.get(`${API_URL}/api/orders/myorders`, {
