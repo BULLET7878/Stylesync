@@ -228,12 +228,12 @@ const SellerDashboard = () => {
         </div>
 
         {pendingOrders.length > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-            <p className="text-sm font-bold text-amber-800">
+          <div className="bg-[#111] text-white rounded-full px-6 py-4 mb-6 flex items-center gap-3 shadow-2xl transition-all hover:scale-[1.01]">
+            <AlertCircle className="w-5 h-5 text-white flex-shrink-0" />
+            <p className="text-sm font-bold">
               {pendingOrders.length} order{pendingOrders.length > 1 ? 's' : ''} awaiting payment verification
             </p>
-            <button onClick={() => { setActiveTab('orders'); setOrderFilter('pending'); }} className="ml-auto text-xs font-black text-amber-700 underline">
+            <button onClick={() => { setActiveTab('orders'); setOrderFilter('pending'); }} className="ml-auto text-xs font-black text-gray-300 hover:text-white underline underline-offset-4 transition-colors">
               Review Now
             </button>
           </div>
