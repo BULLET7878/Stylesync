@@ -35,6 +35,7 @@ const addItemToCart = async (req, res) => {
       cart.cartItems.push({ product, name, image, price, qty });
     }
 
+    cart.markModified('cartItems');
     await cart.save();
     res.json(cart);
   } catch (error) {

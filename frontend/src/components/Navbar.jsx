@@ -245,7 +245,7 @@ const Navbar = () => {
                 </Link>
               ))}
               <span className="w-px h-4 bg-gray-200 mx-1 flex-shrink-0" />
-              {['Shirts', 'T-Shirts', 'Jeans', 'Trousers', 'Shoes', 'Accessories', 'Ethnic Wear'].map((cat) => (
+              {['Shirts', 'T-Shirts', 'Tops', 'Jeans', 'Trousers', 'Shorts', 'Dresses', 'Sarees', 'Kurtas', 'Ethnic Wear', 'Jackets', 'Shoes', 'Accessories', 'Sportswear'].map((cat) => (
                 <Link key={cat}
                   to={`/shop?category=${cat}`}
                   className="whitespace-nowrap px-4 py-1.5 text-xs font-black text-gray-600 hover:text-primary-600 border-b-2 border-transparent hover:border-primary-600 transition-all uppercase tracking-[0.1em]">

@@ -212,11 +212,23 @@ const ProductEdit = () => {
               >
                 <option value="Shirts">Shirts</option>
                 <option value="T-Shirts">T-Shirts</option>
+                <option value="Tops">Tops</option>
                 <option value="Jeans">Jeans</option>
                 <option value="Trousers">Trousers</option>
-                <option value="Shoes">Shoes</option>
-                <option value="Accessories">Accessories</option>
+                <option value="Shorts">Shorts</option>
+                <option value="Dresses">Dresses</option>
+                <option value="Skirts">Skirts</option>
+                <option value="Sarees">Sarees</option>
+                <option value="Kurtas">Kurtas</option>
+                <option value="Lehengas">Lehengas</option>
                 <option value="Ethnic Wear">Ethnic Wear</option>
+                <option value="Jackets">Jackets</option>
+                <option value="Suits">Suits</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Sneakers">Sneakers</option>
+                <option value="Heels">Heels</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Sportswear">Sportswear</option>
               </select>
             </div>
 

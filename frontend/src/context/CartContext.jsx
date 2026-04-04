@@ -52,7 +52,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product, qty) => {
     const item = { 
-      product: product._id || product.product, 
+      product: product.product || product._id, 
       name: product.title || product.name, 
       image: product.images && product.images.length > 0 ? product.images[0] : product.image || '/assets/fallback.png',
       price: product.discountPrice > 0 ? product.discountPrice : (product.price || 0), 

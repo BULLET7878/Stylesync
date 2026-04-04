@@ -10,7 +10,11 @@ import { Filter, Search, Star, X, SlidersHorizontal, LayoutGrid, List, ShoppingC
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 
-const CATEGORIES = ['All', 'Shirts', 'T-Shirts', 'Trousers', 'Jeans', 'Shoes', 'Accessories', 'Ethnic Wear'];
+const CATEGORIES = [
+  'All', 'Shirts', 'T-Shirts', 'Tops', 'Jeans', 'Trousers', 'Shorts',
+  'Dresses', 'Skirts', 'Sarees', 'Kurtas', 'Lehengas', 'Ethnic Wear',
+  'Jackets', 'Suits', 'Shoes', 'Sneakers', 'Heels', 'Accessories', 'Sportswear',
+];
 
 const Shop = () => {
   const { products, loading, searchProducts } = useContext(ProductContext);
