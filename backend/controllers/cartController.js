@@ -8,6 +8,23 @@ const getUserCart = async (req, res) => {
     let cart = await Cart.findOne({ user: req.user._id });
     if (!cart) {
       cart = await Cart.create({ user: req.user._id, cartItems: [] });
+    } else {
+      // Self-heal: merge duplicates
+      const uniqueItems = {};
+      let hasDuplicates = false;
+      for (const item of cart.cartItems) {
+        const prodId = item.product.toString();
+        if (uniqueItems[prodId]) {
+          uniqueItems[prodId].qty += item.qty;
+          hasDuplicates = true;
+        } else {
+          uniqueItems[prodId] = item;
+        }
+      }
+      if (hasDuplicates) {
+        cart.cartItems = Object.values(uniqueItems);
+        await cart.save();
+      }
     }
     res.json(cart);
   } catch (error) {
@@ -27,12 +44,13 @@ const addItemToCart = async (req, res) => {
       cart = new Cart({ user: req.user._id, cartItems: [] });
     }
 
-    const existItem = cart.cartItems.find(x => x.product.toString() === product);
+    const productIdStr = (typeof product === 'object' && product !== null) ? (product._id || product).toString() : product.toString();
+    const existItem = cart.cartItems.find(x => x.product.toString() === productIdStr);
 
     if (existItem) {
       existItem.qty = qty; // update quantity
     } else {
-      cart.cartItems.push({ product, name, image, price, qty });
+      cart.cartItems.push({ product: productIdStr, name, image, price, qty });
     }
 
     cart.markModified('cartItems');

@@ -51,12 +51,16 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (product, qty) => {
+    let pId = product.product || product._id;
+    if (typeof pId === 'object' && pId !== null) pId = pId._id || pId;
+    const productIdStr = String(pId);
+
     const item = { 
-      product: product.product || product._id, 
+      product: productIdStr, 
       name: product.title || product.name, 
       image: product.images && product.images.length > 0 ? product.images[0] : product.image || '/assets/fallback.png',
       price: product.discountPrice > 0 ? product.discountPrice : (product.price || 0), 
-      originalPrice: product.price || 0,
+      originalPrice: product.originalPrice || product.price || 0,
       qty 
     };
 
