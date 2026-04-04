@@ -68,9 +68,9 @@ const ProductDetail = () => {
     toast.success('Added to cart!');
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!product || product.countInStock === 0) return;
-    addToCart(product, qty);
+    await addToCart(product, qty);
     navigate('/checkout');
   };
 

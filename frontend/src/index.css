@@ -64,3 +64,26 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12);
 }
+
+/* Custom Toast UI */
+.custom-toast {
+  background-color: #111 !important;
+  color: #fff !important;
+  border-radius: 9999px !important;
+  padding: 12px 24px !important;
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
+  min-height: auto !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+}
+.custom-toast .Toastify__toast-body {
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-content: center !important;
+}
+.custom-toast .Toastify__close-button {
+  display: none !important;
+}

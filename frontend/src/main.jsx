@@ -19,7 +19,19 @@ createRoot(document.getElementById('root')).render(
           <ProductProvider>
             <WishlistProvider>
               <App />
-              <ToastContainer position="bottom-right" />
+              <ToastContainer 
+                position="bottom-center" 
+                autoClose={3000} 
+                hideProgressBar 
+                newestOnTop 
+                closeOnClick 
+                rtl={false} 
+                pauseOnFocusLoss 
+                draggable 
+                pauseOnHover 
+                theme="dark"
+                toastClassName="custom-toast"
+              />
             </WishlistProvider>
           </ProductProvider>
         </CartProvider>
