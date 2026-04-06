@@ -140,7 +140,10 @@ const Home = () => {
                 <img
                   src={imgUrl(p.images?.[0])}
                   alt={p.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                  loading="eager"
+                  fetchPriority={i === 0 ? 'high' : 'auto'}
+                  decoding="async"
+                  className="img-zoom w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                   onError={(e) => { e.target.src = '/assets/fallback.png'; }}
                 />
                 <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -167,13 +170,13 @@ const Home = () => {
                 setActiveSection(sec.name);
                 document.getElementById('section-browser')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
-              className="relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden group shadow-2xl transition-transform hover:-translate-y-2 text-left w-full"
+              className="gpu-promoted relative aspect-[4/5] sm:aspect-[3/4] rounded-3xl overflow-hidden group shadow-2xl transition-transform duration-300 hover:-translate-y-2 text-left w-full"
             >
-              <img src={sec.img} alt={sec.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className={`absolute inset-0 bg-gradient-to-t ${sec.color} to-transparent opacity-60 group-hover:opacity-80 transition-opacity`} />
+              <img src={sec.img} alt={sec.name} loading="lazy" className="img-zoom w-full h-full object-cover" />
+              <div className={`absolute inset-0 bg-gradient-to-t ${sec.color} to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300`} />
               <div className="absolute inset-0 flex flex-col justify-end p-8">
                 <h3 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{sec.name}</h3>
-                <div className="flex items-center gap-2 text-white/90 text-sm font-bold bg-white/20 backdrop-blur-md w-fit px-4 py-2 rounded-xl group-hover:bg-white group-hover:text-gray-900 transition-all">
+                <div className="flex items-center gap-2 text-white/90 text-sm font-bold bg-white/20 backdrop-blur-md w-fit px-4 py-2 rounded-xl group-hover:bg-white group-hover:text-gray-900 transition-all duration-200">
                   Shop {sec.name} <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
@@ -202,7 +205,7 @@ const Home = () => {
       </section>
 
       {/* ── Section + Category Browser ── */}
-      <section id="section-browser" className="py-14 bg-white">
+      <section id="section-browser" className="py-14 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <div>

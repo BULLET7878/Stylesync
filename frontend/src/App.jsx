@@ -16,10 +16,13 @@ import ProductEdit from './pages/ProductEdit';
 import OrderSuccess from './pages/OrderSuccess';
 import Info from './pages/Info';
 
+// Scroll to top instantly on route change — no jarring jump, no delay
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Use instant scroll (not smooth) so the new page starts at top immediately,
+    // avoiding the visual "scroll past content" glitch on route change.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname]);
   return null;
 };

@@ -52,7 +52,7 @@ const ProductCard = ({ product }) => {
           alt={product.title}
           loading="lazy"
           onError={(e) => { e.target.src = FALLBACK_IMG; }}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isOutOfStock ? 'opacity-60 grayscale' : ''}`}
+          className={`img-zoom w-full h-full object-cover ${isOutOfStock ? 'opacity-60 grayscale' : ''}`}
         />
 
         {/* Badges */}

@@ -13,6 +13,12 @@
   --color-primary-900: #312e81;
 }
 
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor links so sticky navbar doesn't overlap the target */
+  scroll-padding-top: 80px;
+}
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -22,6 +28,25 @@ body {
   background: #f8f8f8;
   color: #111;
 }
+
+/* GPU compositing: only promote the layer right before animation starts.
+   Keeping will-change on idle elements wastes GPU memory & causes jank. */
+.gpu-promoted {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.gpu-promoted:hover,
+.gpu-promoted:focus-within {
+  will-change: transform;
+}
+
+/* Smooth image zoom on hover - optimised */
+.img-zoom {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.img-zoom:hover { transform: scale(1.06) translateZ(0); }
 
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -58,10 +83,12 @@ body {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
 .card-lift {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s ease;
 }
 .card-lift:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
   box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12);
 }
 

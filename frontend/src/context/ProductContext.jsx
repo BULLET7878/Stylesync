@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import API_URL from '../utils/api';
 
@@ -46,8 +46,14 @@ export const ProductProvider = ({ children }) => {
     searchProducts();
   }, []);
 
+  const value = useMemo(
+    () => ({ products, loading, searchProducts, curatedProducts, fetchCuratedList }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [products, loading, curatedProducts]
+  );
+
   return (
-    <ProductContext.Provider value={{ products, loading, searchProducts, curatedProducts, fetchCuratedList }}>
+    <ProductContext.Provider value={value}>
       {children}
     </ProductContext.Provider>
   );

@@ -3,10 +3,18 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/logo.png?v=5" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StyleSync — Discover curated fashion from independent sellers. Premium quality, real style, delivered to your door." />
   <title>StyleSync - Premium Fashion</title>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="icon" type="image/png" href="/logo.png?v=5" />
+
+  <!-- Early connection to image CDN & payment SDK so assets load faster -->
+  <link rel="preconnect" href="https://res.cloudinary.com" />
+  <link rel="preconnect" href="https://checkout.razorpay.com" />
+  <link rel="dns-prefetch" href="https://lottie.host" />
+
+  <!-- Razorpay loaded with defer — no longer blocks HTML parsing -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 </head>
 
 <body>
