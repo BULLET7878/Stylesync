@@ -53,7 +53,7 @@ const Navbar = () => {
       {/* Announcement Bar — buyers only */}
       {!isSeller && (
         <div className="bg-primary-600 text-white text-xs font-semibold text-center py-2 px-4 tracking-wide">
-          🎉 Free shipping on orders above ₹999 &nbsp;·&nbsp; Use code <span className="font-black underline">STYLE10</span> for 10% off
+          Free shipping on orders above ₹999 &nbsp;·&nbsp; Use code <span className="font-black underline">STYLE10</span> for 10% off
         </div>
       )}
       {/* Seller announcement bar */}

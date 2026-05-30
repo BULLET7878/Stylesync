@@ -69,7 +69,7 @@ const ShipModal = ({ order, onClose, onShipped }) => {
           <p className="text-gray-700">{order.shippingAddress?.city}, {order.shippingAddress?.state} — {order.shippingAddress?.postalCode}</p>
           <p className="text-gray-700">{order.shippingAddress?.country}</p>
           {order.shippingAddress?.phone && (
-            <p className="text-primary-700 font-black mt-2">📞 {order.shippingAddress.phone}</p>
+            <p className="text-primary-700 font-black mt-2">Ph: {order.shippingAddress.phone}</p>
           )}
         </div>
         <div className="space-y-3 mb-5">
@@ -518,8 +518,8 @@ const SellerDashboard = () => {
                               <p className="text-sm text-gray-700">{order.shippingAddress?.city}, {order.shippingAddress?.state}</p>
                               <p className="text-sm text-gray-700">PIN: <span className="font-bold">{order.shippingAddress?.postalCode}</span></p>
                               <p className="text-sm text-gray-700">{order.shippingAddress?.country}</p>
-                              {order.shippingAddress?.phone && <p className="text-sm font-black text-primary-600 mt-2">📞 {order.shippingAddress.phone}</p>}
-                              {order.user?.email && <p className="text-xs text-gray-400 mt-1">✉ {order.user.email}</p>}
+                              {order.shippingAddress?.phone && <p className="text-sm font-black text-primary-600 mt-2">Ph: {order.shippingAddress.phone}</p>}
+                              {order.user?.email && <p className="text-xs text-gray-400 mt-1">{order.user.email}</p>}
                             </div>
                             <div className="bg-white rounded-xl border border-gray-100 p-4">
                               <p className="text-xs font-black text-gray-500 uppercase tracking-wider mb-3">Order Items</p>

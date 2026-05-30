@@ -10,48 +10,48 @@ import { imgUrl } from '../utils/imgUrl';
 
 const SECTION_CATEGORIES = {
   Men: [
-    { label: 'Shirts',      emoji: '👔', bg: 'bg-blue-50',    text: 'text-blue-700',   border: 'border-blue-100' },
-    { label: 'T-Shirts',    emoji: '👕', bg: 'bg-sky-50',     text: 'text-sky-700',    border: 'border-sky-100' },
-    { label: 'Jeans',       emoji: '👖', bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
-    { label: 'Trousers',    emoji: '🩳', bg: 'bg-slate-50',   text: 'text-slate-700',  border: 'border-slate-100' },
-    { label: 'Shorts',      emoji: '🩲', bg: 'bg-cyan-50',    text: 'text-cyan-700',   border: 'border-cyan-100' },
-    { label: 'Jackets',     emoji: '🧥', bg: 'bg-gray-100',   text: 'text-gray-700',   border: 'border-gray-200' },
-    { label: 'Suits',       emoji: '🤵', bg: 'bg-zinc-50',    text: 'text-zinc-700',   border: 'border-zinc-200' },
-    { label: 'Kurtas',      emoji: '🧣', bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
-    { label: 'Ethnic Wear', emoji: '🥻', bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
-    { label: 'Shoes',       emoji: '👟', bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
-    { label: 'Sneakers',    emoji: '👞', bg: 'bg-lime-50',    text: 'text-lime-700',   border: 'border-lime-100' },
-    { label: 'Accessories', emoji: '⌚', bg: 'bg-purple-50',  text: 'text-purple-700', border: 'border-purple-100' },
-    { label: 'Sportswear',  emoji: '🏋️', bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
+    { label: 'Shirts',      bg: 'bg-blue-50',    text: 'text-blue-700',   border: 'border-blue-100' },
+    { label: 'T-Shirts',    bg: 'bg-sky-50',     text: 'text-sky-700',    border: 'border-sky-100' },
+    { label: 'Jeans',       bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
+    { label: 'Trousers',    bg: 'bg-slate-50',   text: 'text-slate-700',  border: 'border-slate-100' },
+    { label: 'Shorts',      bg: 'bg-cyan-50',    text: 'text-cyan-700',   border: 'border-cyan-100' },
+    { label: 'Jackets',     bg: 'bg-gray-100',   text: 'text-gray-700',   border: 'border-gray-200' },
+    { label: 'Suits',       bg: 'bg-zinc-50',    text: 'text-zinc-700',   border: 'border-zinc-200' },
+    { label: 'Kurtas',      bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
+    { label: 'Ethnic Wear', bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
+    { label: 'Shoes',       bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
+    { label: 'Sneakers',    bg: 'bg-lime-50',    text: 'text-lime-700',   border: 'border-lime-100' },
+    { label: 'Accessories', bg: 'bg-purple-50',  text: 'text-purple-700', border: 'border-purple-100' },
+    { label: 'Sportswear',  bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
   ],
   Women: [
-    { label: 'Tops',        emoji: '👚', bg: 'bg-pink-50',    text: 'text-pink-700',   border: 'border-pink-100' },
-    { label: 'T-Shirts',    emoji: '👕', bg: 'bg-rose-50',    text: 'text-rose-700',   border: 'border-rose-100' },
-    { label: 'Jeans',       emoji: '👖', bg: 'bg-purple-50',  text: 'text-purple-700', border: 'border-purple-100' },
-    { label: 'Trousers',    emoji: '👗', bg: 'bg-fuchsia-50', text: 'text-fuchsia-700',border: 'border-fuchsia-100' },
-    { label: 'Dresses',     emoji: '👘', bg: 'bg-red-50',     text: 'text-red-700',    border: 'border-red-100' },
-    { label: 'Skirts',      emoji: '🩱', bg: 'bg-violet-50',  text: 'text-violet-700', border: 'border-violet-100' },
-    { label: 'Sarees',      emoji: '🥻', bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
-    { label: 'Kurtas',      emoji: '🧣', bg: 'bg-teal-50',    text: 'text-teal-700',   border: 'border-teal-100' },
-    { label: 'Lehengas',    emoji: '💃', bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
-    { label: 'Ethnic Wear', emoji: '🎎', bg: 'bg-yellow-50',  text: 'text-yellow-700', border: 'border-yellow-100' },
-    { label: 'Shoes',       emoji: '👠', bg: 'bg-pink-100',   text: 'text-pink-800',   border: 'border-pink-200' },
-    { label: 'Accessories', emoji: '👜', bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
-    { label: 'Sportswear',  emoji: '🤸', bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
+    { label: 'Tops',        bg: 'bg-pink-50',    text: 'text-pink-700',   border: 'border-pink-100' },
+    { label: 'T-Shirts',    bg: 'bg-rose-50',    text: 'text-rose-700',   border: 'border-rose-100' },
+    { label: 'Jeans',       bg: 'bg-purple-50',  text: 'text-purple-700', border: 'border-purple-100' },
+    { label: 'Trousers',    bg: 'bg-fuchsia-50', text: 'text-fuchsia-700',border: 'border-fuchsia-100' },
+    { label: 'Dresses',     bg: 'bg-red-50',     text: 'text-red-700',    border: 'border-red-100' },
+    { label: 'Skirts',      bg: 'bg-violet-50',  text: 'text-violet-700', border: 'border-violet-100' },
+    { label: 'Sarees',      bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
+    { label: 'Kurtas',      bg: 'bg-teal-50',    text: 'text-teal-700',   border: 'border-teal-100' },
+    { label: 'Lehengas',    bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
+    { label: 'Ethnic Wear', bg: 'bg-yellow-50',  text: 'text-yellow-700', border: 'border-yellow-100' },
+    { label: 'Shoes',       bg: 'bg-pink-100',   text: 'text-pink-800',   border: 'border-pink-200' },
+    { label: 'Accessories', bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
+    { label: 'Sportswear',  bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
   ],
   Kids: [
-    { label: 'T-Shirts',    emoji: '👕', bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
-    { label: 'Shirts',      emoji: '👔', bg: 'bg-blue-50',    text: 'text-blue-700',   border: 'border-blue-100' },
-    { label: 'Jeans',       emoji: '👖', bg: 'bg-cyan-50',    text: 'text-cyan-700',   border: 'border-cyan-100' },
-    { label: 'Shorts',      emoji: '🩲', bg: 'bg-sky-50',     text: 'text-sky-700',    border: 'border-sky-100' },
-    { label: 'Dresses',     emoji: '👗', bg: 'bg-pink-50',    text: 'text-pink-700',   border: 'border-pink-100' },
-    { label: 'Ethnic Wear', emoji: '🥻', bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
-    { label: 'Shoes',       emoji: '👟', bg: 'bg-yellow-50',  text: 'text-yellow-700', border: 'border-yellow-100' },
-    { label: 'Accessories', emoji: '🎒', bg: 'bg-emerald-50', text: 'text-emerald-700',border: 'border-emerald-100' },
-    { label: 'Sportswear',  emoji: '⚽', bg: 'bg-lime-50',    text: 'text-lime-700',   border: 'border-lime-100' },
-    { label: 'Jackets',     emoji: '🧥', bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
-    { label: 'Trousers',    emoji: '🩳', bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
-    { label: 'Kurtas',      emoji: '🧣', bg: 'bg-rose-50',    text: 'text-rose-700',   border: 'border-rose-100' },
+    { label: 'T-Shirts',    bg: 'bg-green-50',   text: 'text-green-700',  border: 'border-green-100' },
+    { label: 'Shirts',      bg: 'bg-blue-50',    text: 'text-blue-700',   border: 'border-blue-100' },
+    { label: 'Jeans',       bg: 'bg-cyan-50',    text: 'text-cyan-700',   border: 'border-cyan-100' },
+    { label: 'Shorts',      bg: 'bg-sky-50',     text: 'text-sky-700',    border: 'border-sky-100' },
+    { label: 'Dresses',     bg: 'bg-pink-50',    text: 'text-pink-700',   border: 'border-pink-100' },
+    { label: 'Ethnic Wear', bg: 'bg-amber-50',   text: 'text-amber-700',  border: 'border-amber-100' },
+    { label: 'Shoes',       bg: 'bg-yellow-50',  text: 'text-yellow-700', border: 'border-yellow-100' },
+    { label: 'Accessories', bg: 'bg-emerald-50', text: 'text-emerald-700',border: 'border-emerald-100' },
+    { label: 'Sportswear',  bg: 'bg-lime-50',    text: 'text-lime-700',   border: 'border-lime-100' },
+    { label: 'Jackets',     bg: 'bg-orange-50',  text: 'text-orange-700', border: 'border-orange-100' },
+    { label: 'Trousers',    bg: 'bg-indigo-50',  text: 'text-indigo-700', border: 'border-indigo-100' },
+    { label: 'Kurtas',      bg: 'bg-rose-50',    text: 'text-rose-700',   border: 'border-rose-100' },
   ],
 };
 
@@ -220,9 +220,9 @@ const Home = () => {
           {/* Section tabs */}
           <div className="flex gap-2 mb-8">
             {[
-              { key: 'Men', emoji: '👨', color: 'bg-blue-600' },
-              { key: 'Women', emoji: '👩', color: 'bg-pink-500' },
-              { key: 'Kids', emoji: '🧒', color: 'bg-amber-500' },
+              { key: 'Men', color: 'bg-blue-600' },
+              { key: 'Women', color: 'bg-pink-500' },
+              { key: 'Kids', color: 'bg-amber-500' },
             ].map(s => (
               <button
                 key={s.key}
@@ -233,7 +233,7 @@ const Home = () => {
                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <span>{s.emoji}</span> {s.key}
+                {s.key}
               </button>
             ))}
           </div>
@@ -246,8 +246,7 @@ const Home = () => {
                 to={`/shop?section=${activeSection}&category=${encodeURIComponent(cat.label)}`}
                 className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-2xl border ${cat.bg} ${cat.border} hover:shadow-md transition-all group`}
               >
-                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">{cat.emoji}</span>
-                <span className={`text-[10px] sm:text-xs font-bold ${cat.text} text-center leading-tight`}>{cat.label}</span>
+                <span className={`text-xs sm:text-sm font-bold ${cat.text} text-center leading-tight`}>{cat.label}</span>
               </Link>
             ))}
           </div>
@@ -370,12 +369,11 @@ const Home = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Browse & Discover', desc: 'Explore thousands of curated fashion items from verified independent sellers across India.', emoji: '🔍' },
-              { step: '02', title: 'Add & Checkout', desc: 'Add your favourites to cart, choose your size, and pay securely via UPI in seconds.', emoji: '🛒' },
-              { step: '03', title: 'Delivered to You', desc: 'Your order is packed and shipped directly by the seller. Track it live from your dashboard.', emoji: '📦' },
+              { step: '01', title: 'Browse & Discover', desc: 'Explore thousands of curated fashion items from verified independent sellers across India.' },
+              { step: '02', title: 'Add & Checkout', desc: 'Add your favourites to cart, choose your size, and pay securely via UPI in seconds.' },
+              { step: '03', title: 'Delivered to You', desc: 'Your order is packed and shipped directly by the seller. Track it live from your dashboard.' },
             ].map((s) => (
               <div key={s.step} className="relative text-center p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all group">
-                <div className="text-4xl mb-4">{s.emoji}</div>
                 <span className="text-xs font-black text-primary-400 uppercase tracking-widest">{s.step}</span>
                 <h3 className="text-lg font-black text-gray-900 mt-1 mb-2">{s.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
@@ -391,7 +389,6 @@ const Home = () => {
         <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-10 lg:p-14">
-              <span className="text-4xl mb-4 block">🛍️</span>
               <h2 className="text-3xl font-black text-gray-900 mb-3">Seller Controls</h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 Manage your products, track orders, and view your seller performance details here.

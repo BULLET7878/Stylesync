@@ -243,7 +243,7 @@ const Shop = () => {
               </div>
             ) : products.length === 0 ? (
               <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-                <div className="text-5xl mb-4">🔍</div>
+                <Search className="w-10 h-10 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">No products found</h3>
                 <p className="text-gray-500 text-sm mb-6">Try adjusting your search or filters.</p>
                 <button onClick={handleReset} className="bg-primary-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-700 transition-all">
